@@ -5,3 +5,6 @@ def multipl(list):
     for x in list:
         result = result * x
     return result
+
+multipl([1,2,3]) == 6
+multipl([1,2,3]) != 8

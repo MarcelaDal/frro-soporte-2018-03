@@ -6,3 +6,7 @@ def mas_larga(lista):
     if len(e)>len(m):
       m=e
   return m
+
+assert mas_larga(['hola','hola mundo','h']) == 'hola mundo'
+assert mas_larga(['hola','hola mundo','h']) != 'hola'
+
