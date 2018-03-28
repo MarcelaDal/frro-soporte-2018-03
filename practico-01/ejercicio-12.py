@@ -7,4 +7,6 @@ def sumatoria(number):
         count += i+1
 
     return count
-    
+
+assert sumatoria(4) == 10
+assert sumatoria(3) != 10

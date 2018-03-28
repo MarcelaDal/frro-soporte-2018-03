@@ -8,4 +8,5 @@ def programa():
     
   print("Maximo:"+str(max(list)))
   print("Minimo:"+str(min(list)))
+
 programa()
