@@ -30,3 +30,4 @@ def laberinto(maze,x,y,ax,ay):
 
 laberinto(laberinto1,1,2,1,2)
     
+
