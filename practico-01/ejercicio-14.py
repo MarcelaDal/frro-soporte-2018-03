@@ -1,4 +1,7 @@
 #14  
+
+## Comentario
+
 import random 
 laberinto1 = [[False,True,False,False],
               [False,True,True,False],
