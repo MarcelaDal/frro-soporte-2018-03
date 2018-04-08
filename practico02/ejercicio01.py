@@ -16,3 +16,5 @@ r2 = Rectangulo()
 r2.b = 1
 r2.h = 2
 print(r2.area())
+
+

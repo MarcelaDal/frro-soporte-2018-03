@@ -34,3 +34,5 @@ p.altura= 1.75
 p.edad = 22
 p.print_data()
 print('¿Es mayor de edad?', p.es_mayor_edad())
+
+
