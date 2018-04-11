@@ -10,4 +10,4 @@ class Persona():
         return floor((date.today()-self.fecha_nacimiento).days/365)
 
 assert Persona(date(1996,10,31)).edad()==21
-assert Persona(date(1996,10,31)).edad()!=21
+assert Persona(date(1996,10,31)).edad()!=22
