@@ -25,14 +25,12 @@ class Persona:
         print('peso: '+str(self.peso))
         print('altura: '+str(self.altura))
 
-
     def generar_dni(self):
         self.dni = randint(00000000, 99999999)
 
-p = Persona('marcela', sexo='f')
-p.altura= 1.75
-p.edad = 22
-p.print_data()
-print('¿Es mayor de edad?', p.es_mayor_edad())
+
+assert Persona('marcela', sexo='f', edad=22, altura=1.75).print_data()
+assert Persona('marcela', sexo='f', edad=22, altura=1.75).es_mayor_edad()==True
+assert Persona('marcela', sexo='f', edad=22, altura=1.75).es_mayor_edad() != FalseS
 
 

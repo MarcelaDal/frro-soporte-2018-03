@@ -9,12 +9,7 @@ class Rectangulo:
         return self.b * self.h
 
 
-r = Rectangulo(1, 2)
-print(r.area())
-
-r2 = Rectangulo()
-r2.b = 1
-r2.h = 2
-print(r2.area())
+assert Rectangulo(5, 4).area() == 20
+assert Rectangulo(5, 4).area() != 21
 
 

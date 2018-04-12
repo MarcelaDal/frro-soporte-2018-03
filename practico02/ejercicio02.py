@@ -13,11 +13,7 @@ class Circulo:
     def perimetro(self):
         return (self.radio * math.pi) * 2
 
-c = Circulo(1)
-print(c.area())
-print(c.perimetro())
 
-c2 = Circulo()
-c2.r = 1
-print(c2.area())
-print(c2.perimetro())
+assert Circulo(1).area() == math.pi
+assert Circulo(1).perimetro() == 2 * math.pi
+
