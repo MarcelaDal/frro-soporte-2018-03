@@ -29,8 +29,8 @@ class Persona:
         self.dni = randint(00000000, 99999999)
 
 
-assert Persona('marcela', sexo='f', edad=22, altura=1.75).print_data()
+Persona('marcela', sexo='f', edad=22, altura=1.75).print_data()
 assert Persona('marcela', sexo='f', edad=22, altura=1.75).es_mayor_edad()==True
-assert Persona('marcela', sexo='f', edad=22, altura=1.75).es_mayor_edad() != FalseS
+assert Persona('marcela', sexo='f', edad=22, altura=1.75).es_mayor_edad() != False
 
 
