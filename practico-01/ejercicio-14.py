@@ -1,4 +1,7 @@
 #14  
+
+## Comentario
+
 import random 
 laberinto1 = [[False,True,False,False],
               [False,True,True,False],
@@ -30,3 +33,4 @@ def laberinto(maze,x,y,ax,ay):
 
 laberinto(laberinto1,1,2,1,2)
     
+
