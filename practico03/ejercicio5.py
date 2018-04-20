@@ -1,11 +1,18 @@
 import pymysql
+import datetime
+
 
 conector = pymysql.connect(host='localhost', db='tp3', user='root', password='')
 cursor = conector.cursor()
 
-sql='UPDATE `Persona` SET `nombre`="Marcela",`fecha_nacimiento`="2/6/95",`dni`="38770609",`altura`=182 WHERE idPersona=2'
-cursor.execute(sql)
-cursor.execute('SELECT * FROM Persona WHERE idPersona=2')
+date = datetime.datetime.today().strftime('%y-%m-%d %H:%M:%S')
+sql = 'UPDATE Persona SET nombre=%s, fecha_nacimiento=%s, dni=%s , altura=%s WHERE idPersona=3'
+
+cursor.execute(sql, ["Marcela", date, 38770609,175])
+cursor.execute('SELECT * FROM Persona')
 select = cursor.fetchall()
-print(select)
+columnas = [columna[0] for columna in cursor.description]
+for fila in select:
+    print(dict(zip(columnas, fila)))
 conector.commit()
+conector.close()
