@@ -1,4 +1,5 @@
 import pymysql
+import json
 
 conn = pymysql.connect(host="localhost", port=3306, db="tp3", user="root", password="")
 
@@ -10,8 +11,6 @@ cur.execute(query)
 
 result = cur.fetchall()
 
-columns = [column[0] for column in cur.description]
-for row in result:
-    print(dict(zip(columns, row)))
+string = json.dumps(result, default=str)
 
-
+print(string)
