@@ -9,12 +9,9 @@ cursor.execute(sql)
 sql = 'SELECT * FROM Persona'
 cursor.execute(sql)
 select = cursor.fetchall()
-columnas = [columna[0] for columna in cursor.description]
-for fila in select:
-    print(dict(zip(columnas, fila)))
 conector.commit()
 conector.close()
 
-
+assert select == ()
 
 
