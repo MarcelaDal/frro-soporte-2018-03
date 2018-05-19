@@ -34,6 +34,7 @@ def alta():
 
     session.add(p)
     session.commit()
+    assert session.query(Persona).filter(Persona == p).all() == p
 
 
 def list():
@@ -44,9 +45,9 @@ def list():
 
 def baja():
     id = input("Ingrsa el id de la persona a remover:")
-    p = session.query(Persona).filter(Persona.idPersona==id).first()
+    p = session.query(Persona).filter(Persona.idPersona == id).first()
     session.delete(p)
-
+    assert session.query(Persona).filter(Persona == p).all() == []
 
 op = int(input("Ingresar numero:"))
 while op is not 0:
