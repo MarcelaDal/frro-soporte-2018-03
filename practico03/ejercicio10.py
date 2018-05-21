@@ -3,10 +3,10 @@ import pymysql
 conn = pymysql.connect(host="localhost", port=3306, db="tp3", user="root", password="")
 
 cur = conn.cursor()
-query = "SELECT p.nombre, p.fechaNacimiento, p.dni, p.altura, pp.peso, pp.fecha FROM personas p INNER JOIN personapeso pp on p.id = pp.idPersona "
+query = "SELECT p.nombre, p.fecha_nacimiento, p.dni, p.altura, pp.peso, pp.fecha FROM persona p INNER JOIN personapeso pp on p.idPersona = pp.idPersona "
 cur.execute(query)
 result = cur.fetchall()
 
-columns = [column[0] for column in cur.description]
-for row in result:
-    print(dict(zip(columns, row)))
+print(result)
+
+assert result == (('Juan Mannuel', datetime.date(2018, 5, 17), '12345678', 175, 80, datetime.date(2018, 5, 17)),)
