@@ -2,26 +2,26 @@ from tkinter import *
 
 
 class App:
-    def __init__(self, master):
+    def __init__(self, root):
 
-        frameA = Frame(master)
-        frameA.grid(row=0, column=0, padx=2, pady=2)
+        self.frameA = Frame(root)
+        self.frameA.grid(row=0, column=0, padx=2, pady=2)
 
-        Label(frameA, text="Primer operando").grid(row=0, column=0, sticky=W, pady=2, padx=2)
-        Label(frameA, text="Segundo operando").grid(row=0, column=1, sticky=W, pady=2, padx=2)
-        self.entryA = Entry(frameA)
+        Label(self.frameA, text="Primer operando").grid(row=0, column=0, sticky=W, pady=2, padx=2)
+        Label(self.frameA, text="Segundo operando").grid(row=0, column=1, sticky=W, pady=2, padx=2)
+        self.entryA = Entry(self.frameA)
         self.entryA.grid(row=1, column=0, pady=2, padx=2)
-        self.entryB = Entry(frameA)
+        self.entryB = Entry(self.frameA)
         self.entryB.grid(row=1, column=1, pady=2, padx=2)
 
-        frameB = Frame(master)
-        frameB.grid(row=0, column=1, padx=2, pady=2)
-        Button(frameB, text="+", command=self.handleMas).grid(row=0, column=0)
-        Button(frameB, text="-", command=self.handleMenos).grid(row=0, column=1)
-        Button(frameB, text="/", command=self.handleDiv).grid(row=0, column=2)
-        Button(frameB, text="*", command=self.handlePor).grid(row=0, column=3)
+        self.frameB = Frame(root)
+        self.frameB.grid(row=0, column=1, padx=2, pady=2)
+        Button(self.frameB, text="+", command=self.handleMas).grid(row=0, column=0)
+        Button(self.frameB, text="-", command=self.handleMenos).grid(row=0, column=1)
+        Button(self.frameB, text="/", command=self.handleDiv).grid(row=0, column=2)
+        Button(self.frameB, text="*", command=self.handlePor).grid(row=0, column=3)
         self.resultado = StringVar(value="Resultado: ")
-        Label(master, textvariable=self.resultado).grid(row=3, sticky=W)
+        Label(root, textvariable=self.resultado).grid(row=3, sticky=W)
 
     def handleMas(self):
         entrys=self.getEntrys()
