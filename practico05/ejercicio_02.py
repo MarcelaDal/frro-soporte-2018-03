@@ -9,7 +9,7 @@ from practico05.ejercicio_01 import Base, Socio
 class DatosSocio(object):
 
     def __init__(self):
-        engine = create_engine('sqlite:///socios.db')
+        engine = create_engine('mysql+pymysql://root@localhost/trabajopractico5')
         Base.metadata.bind = engine
         db_session = sessionmaker()
         db_session.bind = engine
@@ -21,14 +21,16 @@ class DatosSocio(object):
         Devuelve None si no encuentra nada.
         :rtype: Socio
         """
-        return
+        p = self.session.query(Socio).filter(Socio.id == id_socio).first()
+        return p
 
     def todos(self):
         """
         Devuelve listado de todos los socios en la base de datos.
         :rtype: list
         """
-        return []
+        socios = self.session.query(Socio).all()
+        return socios
 
     def borrar_todos(self):
         """
@@ -36,7 +38,14 @@ class DatosSocio(object):
         Devuelve True si el borrado fue exitoso.
         :rtype: bool
         """
-        return False
+        try:
+            socios = self.todos()
+            for socio in socios:
+                self.session.delete(socio)
+            self.session.commit()
+        except Exception:
+            return False
+        return True
 
     def alta(self, socio):
         """
@@ -44,6 +53,8 @@ class DatosSocio(object):
         :type socio: Socio
         :rtype: Socio
         """
+        self.session.add(socio)
+        self.session.commit()
         return socio
 
     def baja(self, id_socio):
@@ -52,7 +63,14 @@ class DatosSocio(object):
         Devuelve True si el borrado fue exitoso.
         :rtype: bool
         """
-        return False
+        socio = self.buscar(id_socio)
+        try:
+            self.session.delete(socio)
+            self.session.commit()
+        except Exception:
+            return False
+
+        return True
 
     def modificacion(self, socio):
         """
@@ -61,7 +79,10 @@ class DatosSocio(object):
         :type socio: Socio
         :rtype: Socio
         """
-        return socio
+        socio_viejo=self.buscar(socio.id)
+        socio_viejo=socio
+        self.session.commit()
+        return False
 
 
 def pruebas():
@@ -99,3 +120,4 @@ def pruebas():
 
 if __name__ == '__main__':
     pruebas()
+
