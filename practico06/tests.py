@@ -1,9 +1,10 @@
 # Implementar los casos de prueba descriptos.
 
 import unittest
+import random
 
 from practico05.ejercicio_01 import Socio
-from practico06.capa_negocio import NegocioSocio, LongitudInvalida
+from practico06.capa_negocio import NegocioSocio, LongitudInvalida, DniRepetido, MaximoAlcanzado
 
 
 class TestsNegocio(unittest.TestCase):
@@ -40,7 +41,7 @@ class TestsNegocio(unittest.TestCase):
 
         #inválido
         invalido = Socio(dni=12345678, nombre='Jane', apellido='Doe')
-        self.assertFalse(self.ns.regla_1(invalido))
+        self.assertRaises(DniRepetido, self.ns.regla_1,  invalido)
 
     def test_regla_2_nombre_menor_3(self):
         # valida regla
@@ -79,7 +80,12 @@ class TestsNegocio(unittest.TestCase):
         self.assertRaises(LongitudInvalida, self.ns.regla_2, invalido)
 
     def test_regla_3(self):
-        pass
+        for i in range(0, 200):
+            socio = Socio(dni=i, nombre='Juan', apellido='Perez')
+            self.ns.alta(socio)
+
+        socio = Socio(dni=201, nombre='Juan', apellido='Perez')
+        self.assertRaises(MaximoAlcanzado, self.ns.alta(socio))
 
 
     def test_buscar(self):
@@ -89,7 +95,8 @@ class TestsNegocio(unittest.TestCase):
         self.assertTrue(self.ns.buscar(exito.id))
 
         #socio inexistente
-        self.assertFalse(self.ns.buscar(33))
+        self.ns.baja(exito.id)
+        self.assertFalse(self.ns.buscar(exito.id))
 
     def test_buscar_dni(self):
         #socio existente

@@ -68,14 +68,17 @@ class NegocioSocio(object):
         :type socio: Socio
         :rtype: bool
         """
-        if (self.regla_1(socio) and self.regla_2(socio) and self.regla_3()):
-            socio = self.datos.alta(socio)
-            if socio:
-                return socio
+        try:
+            if (self.regla_1(socio) and self.regla_2(socio) and self.regla_3()):
+                socio = self.datos.alta(socio)
+                if socio:
+                    return socio
+                else:
+                    return False
             else:
                 return False
-        else:
-            return False
+        except Exception as e:
+            return e
 
     def baja(self, id_socio):
         """
@@ -112,12 +115,15 @@ class NegocioSocio(object):
         :type socio: Socio
         :rtype: bool
         """
-        if self.regla_2(socio):
-            p = self.datos.modificacion(socio)
-            if p:
-                return True
-            else:
-                return False
+        try:
+            if self.regla_2(socio):
+                p = self.datos.modificacion(socio)
+                if p:
+                    return True
+                else:
+                    return False
+        except Exception as e:
+            return e
 
     def regla_1(self, socio):
         """
@@ -128,7 +134,7 @@ class NegocioSocio(object):
         """
         socios = self.datos.todos()
         for s in socios:
-            if s.dni == socio.dni:
+            if s.dni == str(socio.dni):
                 raise DniRepetido('El número de documento ya existe.')
                 return False
 
