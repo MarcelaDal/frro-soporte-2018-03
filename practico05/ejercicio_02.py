@@ -24,6 +24,16 @@ class DatosSocio(object):
         p = self.session.query(Socio).filter(Socio.id == id_socio).first()
         return p
 
+    def buscar_dni(self, dni_socio):
+        """
+        Devuelve la instancia del socio, dado su dni.
+        Devuelve None si no encuentra nada.
+        :rtype: Socio
+        """
+
+        p = self.session.query(Socio).filter(Socio.dni == dni_socio).first()
+        return p
+
     def todos(self):
         """
         Devuelve listado de todos los socios en la base de datos.
