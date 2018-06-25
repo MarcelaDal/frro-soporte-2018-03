@@ -92,7 +92,7 @@ class DatosSocio(object):
         socio_viejo=self.buscar(socio.id)
         socio_viejo=socio
         self.session.commit()
-        return False
+        return socio_viejo
 
 
 def pruebas():
