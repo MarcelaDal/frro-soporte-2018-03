@@ -41,7 +41,8 @@ class TestsNegocio(unittest.TestCase):
 
         #inválido
         invalido = Socio(dni=12345678, nombre='Jane', apellido='Doe')
-        self.assertRaises(DniRepetido, self.ns.regla_1,  invalido)
+        with self.assertRaises(DniRepetido):
+            self.ns.regla_1(invalido)
 
     def test_regla_2_nombre_menor_3(self):
         # valida regla
@@ -84,8 +85,8 @@ class TestsNegocio(unittest.TestCase):
             socio = Socio(dni=i, nombre='Juan', apellido='Perez')
             self.ns.alta(socio)
 
-        socio = Socio(dni=201, nombre='Juan', apellido='Perez')
-        self.assertRaises(MaximoAlcanzado, self.ns.alta(socio))
+        with self.assertRaises(MaximoAlcanzado):
+            self.ns.regla_3()
 
 
     def test_buscar(self):
@@ -103,7 +104,7 @@ class TestsNegocio(unittest.TestCase):
          #socio existente
         socio = Socio(dni=12345678, nombre='Juan', apellido='Perez')
         exito = self.ns.alta(socio)
-        self.assertTrue(self.ns.buscar(exito.dni))
+        self.assertTrue(self.ns.buscar_dni(exito.dni))
 
         #socio inexistente
         self.assertFalse(self.ns.buscar_dni(98765432))
@@ -117,7 +118,7 @@ class TestsNegocio(unittest.TestCase):
 
         #logica
         cant = self.ns.todos()
-        self.assertEqual(cant, 1)
+        self.assertEqual(len(cant), 1)
 
     def test_modificacion(self):
         # pre-condiciones: socio existe
@@ -126,9 +127,9 @@ class TestsNegocio(unittest.TestCase):
         self.assertTrue(res)
 
         # ejecuto la logica
-        res.nombre = 'Juan Carlos'
-        exito = self.ns.modificacion(res)
-        self.assertEqual(socio, exito)
+        socio.nombre = 'Juan Carlos'
+        exito = self.ns.modificacion(socio)
+        self.assertTrue(exito)
 
         #inválido por longitud de nombre
         socio.nombre = 'Jose Manuel del corazon de Jesus'
@@ -148,7 +149,7 @@ class TestsNegocio(unittest.TestCase):
         self.assertEqual(len(self.ns.todos()), 1)
 
         # ejecuto la logica
-        exito = self.ns.baja(1)
+        exito = self.ns.baja(socio.id)
 
         # post-condiciones: 0 socios registrados
         self.assertTrue(exito)

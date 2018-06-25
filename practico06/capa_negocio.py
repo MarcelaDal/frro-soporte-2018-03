@@ -123,7 +123,7 @@ class NegocioSocio(object):
                 else:
                     return False
         except Exception as e:
-            return e
+            return False
 
     def regla_1(self, socio):
         """
@@ -133,12 +133,11 @@ class NegocioSocio(object):
         :return: bool
         """
         socios = self.datos.todos()
-        for s in socios:
-            if s.dni == str(socio.dni):
-                raise DniRepetido('El número de documento ya existe.')
-                return False
-
-        return True
+        result = socio.dni not in [s.dni for s in socios]
+        if result:
+            return True
+        else:
+            raise DniRepetido
 
 
     def regla_2(self, socio):
@@ -151,11 +150,10 @@ class NegocioSocio(object):
 
         if len(socio.nombre) < self.MIN_CARACTERES or len(socio.nombre) > self.MAX_CARACTERES:
             raise LongitudInvalida('El nombre debe contener al menos 3 caracteres y no más de 15.')
-            return False
 
         if len(socio.apellido) < self.MIN_CARACTERES or len(socio.apellido) > self.MAX_CARACTERES:
             raise LongitudInvalida('El apellido debe contener al menos 3 caracteres y no más de 15.')
-            return False
+
 
         return True
 
@@ -168,6 +166,5 @@ class NegocioSocio(object):
         socios = self.datos.todos()
         if len(socios) >= self.MAX_SOCIOS:
             raise MaximoAlcanzado('Se ha alcanzado el límite de socios permitido.')
-            return False
 
         return True
