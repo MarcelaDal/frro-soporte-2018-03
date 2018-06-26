@@ -40,12 +40,16 @@ class ABMSocios(Frame):
         TlSocio(root=alta, master=self, tipo="alta")
 
     def handleBaja(self):
+        for socio in self.twSocios.selection():
+            self.capa_negocio.baja(self.twSocios.item(socio)['text'])
         self.vaciar_treeview()
+        self.cargar_socios()
 
 
     def handleModificacion(self):
         modificacion = Toplevel()
         TlSocio(root=modificacion, master=self, tipo="modificacion")
+
 
 if __name__ == "__main__":
     father = Tk()
