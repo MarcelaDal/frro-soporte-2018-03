@@ -7,7 +7,7 @@ class App:
         self.FrameM = Frame(root)
         self.FrameM.grid(row=0, column=0, ipady=5, ipadx=5)
         self.framT = Frame(self.FrameM)
-        self.framT.grid(column=0, row=0,padx=5,pady=5)
+        self.framT.grid(column=0, row=0, padx=5, pady=5)
         self.treeview = ttk.Treeview(self.framT, columns="cp")
         self.treeview.grid(column=0, row=0)
         self.agregar_item("Rosario", 2000)
