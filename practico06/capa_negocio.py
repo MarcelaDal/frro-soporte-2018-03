@@ -116,14 +116,14 @@ class NegocioSocio(object):
         :rtype: bool
         """
         try:
-            if self.regla_2(socio):
+            if (self.regla_2(socio) and self.regla_1(socio)):
                 p = self.datos.modificacion(socio)
                 if p:
-                    return True
+                    return p
                 else:
                     return False
         except Exception as e:
-            return False
+            return e
 
     def regla_1(self, socio):
         """
@@ -137,7 +137,7 @@ class NegocioSocio(object):
         if result:
             return True
         else:
-            raise DniRepetido
+            raise DniRepetido('El número de DNI no se puede repetir.')
 
 
     def regla_2(self, socio):

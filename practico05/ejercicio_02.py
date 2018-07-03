@@ -89,8 +89,10 @@ class DatosSocio(object):
         :type socio: Socio
         :rtype: Socio
         """
-        socio_viejo=self.buscar(socio.id)
-        socio_viejo=socio
+        socio_viejo = self.buscar(socio.id)
+        socio_viejo.apellido = socio.apellido
+        socio_viejo.nombre = socio.nombre
+        socio_viejo.dni = socio.dni
         self.session.commit()
         return socio_viejo
 
