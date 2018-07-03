@@ -2,9 +2,10 @@ from tkinter import *
 from tkinter import ttk
 from practico06.capa_negocio import NegocioSocio
 from practico07.TlSocio import TlSocio
+from practico05.ejercicio_01 import Socio
 
 class ABMSocios(Frame):
-    def __init__(self,root=None):
+    def __init__(self, root=None):
         super().__init__(root)
         self.grid(row=0, column=0, ipady=5, ipadx=5)
         self.create_components()
@@ -35,6 +36,10 @@ class ABMSocios(Frame):
     def vaciar_treeview(self):
         self.twSocios.delete(*self.twSocios.get_children())
 
+    def refresh_treeview(self):
+        self.vaciar_treeview()
+        self.cargar_socios()
+
     def handleAlta(self):
         alta = Toplevel()
         TlSocio(root=alta, master=self, tipo="alta")
@@ -47,9 +52,21 @@ class ABMSocios(Frame):
 
 
     def handleModificacion(self):
-        modificacion = Toplevel()
-        TlSocio(root=modificacion, master=self, tipo="modificacion")
+        for socio in self.twSocios.selection():
+            s = self.capa_negocio.buscar(self.twSocios.item(socio)['text'])
+            if s is not None:
+                modificacion = Toplevel()
+                TlSocio(root=modificacion, master=self, tipo="modificacion", socio=s)
+            else:
+                print('Seleccione un socio para poder modificar los datos.')
 
+    def agregar(self, socio):
+        return self.capa_negocio.alta(socio)
+
+
+
+    def modificar(self, socio):
+        return self.capa_negocio.modificacion(socio)
 
 if __name__ == "__main__":
     father = Tk()
