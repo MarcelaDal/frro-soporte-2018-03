@@ -132,9 +132,8 @@ class NegocioSocio(object):
         :raise: DniRepetido
         :return: bool
         """
-        socios = self.datos.todos()
-        result = socio.dni not in [s.dni for s in socios]
-        if result:
+        result = self.datos.buscar_dni(socio.dni)
+        if result is None:
             return True
         else:
             raise DniRepetido('El número de DNI no se puede repetir.')
