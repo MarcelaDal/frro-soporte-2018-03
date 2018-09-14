@@ -1,3 +1,7 @@
 .idea/*
 
 practico04/__pychache/__/*
+
+.gitignore
+
+/venv/*
