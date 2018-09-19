@@ -1,6 +1,6 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from practico08.data.models import Base, Usuario
+from practico08.data.models import Base, Usuario, Sala
 
 
 class CapaDatos():
@@ -52,11 +52,21 @@ class CapaDatos():
         u.refresh_token = usuario.refresh_token
         self.session.commit()
 
+    def alta_sala(self, sala):
+        """
+
+        :type sala:Sala
+        :rtype:Sala
+        """
+        self.session.add(sala)
+        self.session.commit()
+        return sala
 
 def test():
     datos = CapaDatos()
     usuario = datos.alta_usuario(Usuario(nombre="tito"))
     print(usuario.id)
+    sala = datos.alta_sala(Sala(id_dueno=usuario.id, link=usuario.nombre)) # De momento le metemos el id, pero tendria que ser algo como un hash
 
 
 if __name__ == '__main__':

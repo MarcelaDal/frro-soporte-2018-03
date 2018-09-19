@@ -17,7 +17,7 @@ class Sala(Base):
 
     id = Column(Integer, autoincrement=True, primary_key=True)
     link = Column(String(255))
-    id_dueno = Column(Integer, ForeignKey('usuario.id'))
+    id_dueno = Column(Integer, ForeignKey('usuarios.id'))
     id_votacion = Column(Integer, ForeignKey('votacion.id'), nullable=True)
 
 
