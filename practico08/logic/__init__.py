@@ -1,4 +1,5 @@
-from practico08.data import CapaDatos, Usuario
+from practico08.data import CapaDatos
+from practico08.data.models import Usuario, Voto
 async def init_logic(app):
     logica = Logic()
     app['logic'] = logica
@@ -66,3 +67,6 @@ class Logic():
         """
         s = self.datos.buscar_sala_por_link(link)
         return s
+
+    def alta_voto(self, id_usuario, id_votacion, id_cancion):
+        pass
