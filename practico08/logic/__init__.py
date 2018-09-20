@@ -52,5 +52,17 @@ class Logic():
     """
     Guarda una sala
     """
-    def saveSala(self, sala):
-        pass
+    def alta_sala(self, sala):
+        s = None
+        #validar que tiene una sala activa a la vez?
+        s = self.datos.alta_sala(sala)
+        return s
+
+    def buscar_sala_por_codigo(self, link):
+        """
+        Busca una sala por link de invitacion. Si no lo encuentra devuelve None
+        :type id:str
+        :rtype: Usuario
+        """
+        s = self.datos.buscar_sala_por_link(link)
+        return s

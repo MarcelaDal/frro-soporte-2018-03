@@ -53,20 +53,31 @@ class CapaDatos():
         self.session.commit()
 
     def alta_sala(self, sala):
-        """
 
-        :type sala:Sala
-        :rtype:Sala
+        """
+        Da de alta a una sala y la devuelve
+        :type sala: Sala
+        :rtype: Sala
         """
         self.session.add(sala)
         self.session.commit()
         return sala
 
+    def buscar_sala_por_link(self, link_invitacion):
+        """
+        Busca una sala por link_invitacion y la devuelve. Si no la encuentra devuelve None
+        :type codigo: string
+        :rtype:Sala
+        """
+        s = self.session.query(Sala).filter(Sala.link_invitacion == link_invitacion).first()
+        return s
+
+
 def test():
     datos = CapaDatos()
     usuario = datos.alta_usuario(Usuario(nombre="tito"))
     print(usuario.id)
-    sala = datos.alta_sala(Sala(id_dueno=usuario.id, link=usuario.nombre)) # De momento le metemos el id, pero tendria que ser algo como un hash
+    sala = datos.alta_sala(Sala(id_admin=usuario.id, link_invitacion=usuario.nombre)) # De momento le metemos el id, pero tendria que ser algo como un hash
 
 
 if __name__ == '__main__':

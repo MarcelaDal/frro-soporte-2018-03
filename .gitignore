@@ -5,3 +5,7 @@ practico04/__pychache/__/*
 .gitignore
 
 /venv/*
+
+__pycache__/
+
+.gitignore
