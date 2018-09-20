@@ -1,6 +1,6 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from practico08.data.models import Base, Usuario
+from practico08.data.models import Base, Usuario, Sala
 
 
 class CapaDatos():
@@ -51,6 +51,25 @@ class CapaDatos():
         u.token = usuario.token
         u.refresh_token = usuario.refresh_token
         self.session.commit()
+
+    def alta_sala(self, sala):
+            """
+            Da de alta a una sala y la devuelve
+            :type sala: Sala
+            :rtype: Sala
+            """
+            self.session.add(sala)
+            self.session.commit()
+            return sala
+
+    def buscar_sala_por_link(self, link_invitacion):
+        """
+        Busca una sala por link_invitacion y la devuelve. Si no la encuentra devuelve None
+        :type codigo: string
+        :rtype:Sala
+        """
+        s = self.session.query(Sala).filter(Sala.link_invitacion == link_invitacion).first()
+        return s
 
 
 def test():
