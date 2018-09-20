@@ -58,11 +58,11 @@ class Logic():
         s = self.datos.alta_sala(sala)
         return s
 
-    def buscar_sala_por_codigo(self, id):
+    def buscar_sala_por_codigo(self, link):
         """
-        Busca un usuario por id y lo devuelve. Si no lo encuentra devuelve None
+        Busca una sala por link de invitacion. Si no lo encuentra devuelve None
         :type id:str
         :rtype: Usuario
         """
-        u = self.datos.buscar_usuario_por_id(id)
-        return u
+        s = self.datos.buscar_sala_por_link(link)
+        return s
