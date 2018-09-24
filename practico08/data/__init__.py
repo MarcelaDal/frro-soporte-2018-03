@@ -72,6 +72,15 @@ class CapaDatos():
         s = self.session.query(Sala).filter(Sala.link_invitacion == link_invitacion).first()
         return s
 
+    def buscar_sala_por_id(self, id_sala):
+        """
+        Busca un usuario por id y lo devuelve
+        :type id_sala:int
+        :rtype: Sala
+        """
+        s = self.session.query(Sala).filter(Sala.id == id_sala).first()
+        return s
+
     def alta_voto(self, voto):
         """
         Da de alta un voto si no puede devuelve none

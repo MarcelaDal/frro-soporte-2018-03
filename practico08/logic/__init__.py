@@ -1,5 +1,5 @@
 from practico08.data import CapaDatos
-from practico08.data.models import Usuario, Voto
+from practico08.data.models import Usuario, Voto, Sala
 
 
 async def init_logic(app):
@@ -31,7 +31,7 @@ class Logic():
                 else:
                     return False
             else:
-                False
+                return False
         except Exception as e:
             return e
 
@@ -51,7 +51,7 @@ class Logic():
     def buscar_usuario_por_id(self, id):
         """
         Busca un usuario por id y lo devuelve. Si no lo encuentra devuelve None
-        :type id:str
+        :type id:int
         :rtype: Usuario
         """
         u = self.datos.buscar_usuario_por_id(id)
@@ -65,6 +65,11 @@ class Logic():
         """
         u = self.datos.buscar_usuario_por_nombre(nombre)
         return u
+
+    def buscar_usuario_por_id_sala(self, id_sala):
+        sala = self.datos.buscar_sala_por_id(id_sala)
+        user = self.datos.buscar_usuario_por_id(sala.)
+        return user
 
     def modificar_usuario(self, usuario):
         """
