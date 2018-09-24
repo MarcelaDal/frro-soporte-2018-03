@@ -61,8 +61,12 @@ class Auth(web.View):
                         user = logic.buscar_usuario_por_id(state)
                         user.token = text['access_token']
                         user.refresh_token = text['refresh_token']
+                        user_data = await session.get('https://api.spotify.com/v1/me',
+                                                      headers={'Authorization': 'Bearer '+ user.token}
+                                                      )
+                        user_data_json = await user_data.json()
+                        user.id_usuario_spotify = user_data_json['id']
                         user = logic.modificar_usuario(user)
-                        print(user)
                         miresp = web.Response(status=200, text='Se ha registrado usuario')
                         return miresp
         return web.Response(status=502)

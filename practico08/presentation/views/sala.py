@@ -13,7 +13,7 @@ async def crear_sala(request):
     """
     req = await request.json()
     if not req.get('id_admin'):
-        return web.Response(text='Bad Request', code=400)
+        return web.Response(text='Bad Request', status=400)
     id_admin = req.get('id_admin')
     logic = request.app['logic']
     usuario = logic.buscar_usuario_por_id(id_admin)
@@ -21,33 +21,26 @@ async def crear_sala(request):
         nueva_sala = Sala()
         nueva_sala.id_admin = usuario.id
         nueva_sala.link_invitacion = getRandomsString()
-        sala = logic.alta_sala(nueva_sala)
-
-        if type(sala) == Sala:
-            async with ClientSession() as session:
-                    id_usuario_spotify = usuario.id_usuario_spotify
-                    async with session.post('https://api.spotify.com/v1/playlists',
-                                             headers={
-                                                'Accept': 'application/json',
-                                                'Content-Type': 'application/json',
-                                                'Authorization': 'Bearer BQAWchdDbseX4Izz9sqC4DoNBj1gSfDZ4C3ADu_OrkQWsBibbi4DwSp1vRFqg6gUgRU3nCME_PPVC4oxxaMvlNeCAqme8XwlIkGIrdxo8eDbauJ'
-                                            },
-                                            data={
-                                                'name': 'New Playlist',
-                                                'description': 'New playlist description',
-                                                'public': 'false'
-                                            }
-                                           ) as resp:
-                        if resp:
-                            text = await resp.json()
-                            resp = resp.status
-                            miresp = web.Response(status=200, text=str(resp))
-                            return miresp
-                        else:
-                            return resp
+        async with ClientSession() as session:
+                id_usuario_spotify = usuario.id_usuario_spotify
+                async with session.post('https://api.spotify.com/v1/users/'+str(id_usuario_spotify)+'/playlists',
+                                         headers={
+                                            'Content-Type': 'application/json',
+                                            'Authorization': 'Bearer ' + usuario.token
+                                        },
+                                        json={
+                                            'name': 'New Playlist',
+                                            'description': 'New playlist description',
+                                            'public': 'false'
+                                        }
+                                       ) as resp:
+                    text = await resp.json()
+                    nueva_sala.id_playlist = text['id']
+                    sala = logic.alta_sala(nueva_sala)
+                    miresp = web.Response(status=200, text="Sala creada")
+                    return miresp
             #return web.Response(text="Sala creada")
-        else:
-            return web.Response(text="No se ha podido crear una nueva sala. Intente más tarde.")
+            #return web.Response(text="No se ha podido crear una nueva sala. Intente más tarde.")
 
 @Routes.get("/sala/{link_invitacion}")
 async def obtener_sala_por_link(request):

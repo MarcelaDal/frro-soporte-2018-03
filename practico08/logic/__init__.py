@@ -25,7 +25,6 @@ class Logic:
         try:
 
             if self.isUsuarioUnico(usuario.nombre) and self.isLongitudValida(usuario.nombre):
-                print('Holis')
                 p = self.datos.alta_usuario(usuario)
                 return p
             else:

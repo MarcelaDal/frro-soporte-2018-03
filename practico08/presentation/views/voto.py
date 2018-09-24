@@ -62,7 +62,7 @@ async def lanzar_votacion(sala, votacion, app):
         sala = app['logic'].buscar_sala_por_id(sala.id)
         cancion = app['logic'].obtener_resultado_de_votacion(votacion, sala)
         # Cambiar la cancion
-        await session.post('https://api.spotify.com/v1/playlists/' + sala.playlist_id + '/tracks',
+        await session.post('https://api.spotify.com/v1/playlists/' + sala.id_playlist + '/tracks',
                                 headers={
                                     'Authorization': auth_str,
                                     'Content-Type': 'application/json'

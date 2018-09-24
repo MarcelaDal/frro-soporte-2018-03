@@ -26,6 +26,8 @@ class Sala(Base):
     id_admin = Column(Integer, ForeignKey('usuario.id'), nullable=False)
     link_invitacion = Column(String(250), default=0)
     votacion_vigente = Column(Boolean, nullable=False, default=0)
+    id_playlist = Column(String(255))
+    puntero = Column(Integer, default=1)
 
 
 class Sesion(Base):
