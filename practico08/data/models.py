@@ -11,6 +11,7 @@ class Usuario(Base):
     nombre = Column(String(255), unique=True)
     token = Column(String(255), nullable=True)
     refresh_token = Column(String(255), nullable=True)
+    id_usuario_spotify = Column(String(255), nullable=True)
 
     #salas = relationship('Sesion', secondary=Sesion, lazy='subquery',
      #                    backref=backref('usuarios', lazy=True))
@@ -23,7 +24,7 @@ class Sala(Base):
 
     id = Column(Integer, autoincrement=True, primary_key=True)
     id_admin = Column(Integer, ForeignKey('usuario.id'), nullable=False)
-    link_invitacion = Column(String(250))
+    link_invitacion = Column(String(250), default=0)
     votacion_vigente = Column(Boolean, nullable=False, default=0)
 
 

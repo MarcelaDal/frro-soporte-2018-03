@@ -6,7 +6,7 @@ import asyncio
 from practico08.logic import Logic
 
 @Routes.post('/voto')
-def votar(request):
+async def votar(request):
     """
     :type request: Request
     :rtype: json_response
