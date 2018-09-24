@@ -4,7 +4,7 @@ from aiohttp.web import Request, json_response
 import asyncio
 
 @Routes.post('/voto')
-def votar(request):
+async def votar(request):
     """
     :type request: Request
     :rtype: json_response
