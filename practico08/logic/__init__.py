@@ -1,6 +1,6 @@
 from practico08.data import CapaDatos
-from practico08.data.models import Usuario, Voto, Sala
-
+from practico08.data.models import Usuario, Voto, Sala, Votacion
+from collections import Counter
 
 async def init_logic(app):
     logica = Logic()
@@ -68,7 +68,7 @@ class Logic():
 
     def buscar_usuario_por_id_sala(self, id_sala):
         sala = self.datos.buscar_sala_por_id(id_sala)
-        user = self.datos.buscar_usuario_por_id(sala.)
+        user = self.datos.buscar_usuario_por_id(sala.id)
         return user
 
     def modificar_usuario(self, usuario):
@@ -100,6 +100,26 @@ class Logic():
 
     def alta_voto(self, voto):
         v = self.datos.alta_voto(voto)
+
+    def obtener_resultado_votacion(self, votacion):
+        resultado = Counter([voto.id_cancion for voto in self.votos_get_all(votacion.id)]).most_common(1)[0][0]
+        self.baja_votacion(votacion.id)
+
+    def buscar_votacion_por_id(self,id):
+        """
+
+        :param id:
+        :rtype:Votacion
+        """
+        votacion = self.datos.buscar_votacion_por_id(id)
+        return votacion
+
+    def votos_get_all(self,id):
+        votos = self.datos.votos_get_all(id)
+        return votos
+
+    def baja_votacion(self, votacion):
+        self.datos.baja_votacion(self.buscar_votacion_por_id(votacion))
 
 
 class UsuarioRepetido(Exception):

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from practico08.data.models import Base, Usuario, Sala, Voto
+from practico08.data.models import Base, Usuario, Sala, Voto, Votacion
 
 
 class CapaDatos():
@@ -38,6 +38,18 @@ class CapaDatos():
         """
         u = self.session.query(Usuario).filter(Usuario.id == id).first()
         return u
+
+    def buscar_votacion_por_id(self, id):
+        v = self.session.query(Votacion).filter(Votacion.id == id).first()
+        return v
+
+    def votos_get_all(self, id):
+        votos = self.session.query(Voto).filter(Voto.id_votacion ==id).all()
+        return votos
+
+    def baja_votacion(self, votacion):
+        self.session.delete(votacion)
+        self.session.commit()
 
     def modificar_usuario(self, usuario):
         """
