@@ -21,19 +21,19 @@ class Auth(web.View):
         nombre = req.get('nombre')
         logic = self.request.app['logic']
         usuario = logic.alta_usuario(Usuario(nombre=nombre))
-        if usuario:
+        if type(usuario) == Usuario:
             if req.get('hasSpotify') and not (usuario.token or usuario.refresh_token):
                 return web.json_response(status=200, data={"url": 'https://accounts.spotify.com/authorize?' +
                                                                   urlencode({'response_type': 'code',
                                                                              'client_id': self.request.app['config']['client_id'],
-                                                                             'scope': 'user-modify-playback-state',
+                                                                             'scope': self.request.app['config']['scope'],
                                                                              'redirect_uri': self.request.app['config']['callback_uri'],
                                                                              'state': str(usuario.id)
                                                                              })})
             else:
                 return web.Response(status=200, text="Usuario registrado")
         else:
-            return web.json_response(status=400, text="Usuario ya existente")
+            return web.json_response(status=400, text=usuario)
 
     """
     No se que tan buena practica es implementarlo asi pero bue..., puse el retorno al que llamaria spotify dentro del misma entrada pero por get

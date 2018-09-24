@@ -39,10 +39,11 @@ class Votacion(Base):
     __tablename__ = 'votacion'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
-    tiempo_vida = Column(DateTime)
+    tiempo_vida = Column(Integer) #Esto por como funciona ahora se podria sascar
     id_sala = Column(Integer, ForeignKey('sala.id'))
 
     votos = relationship('voto', uselist=True, backref='votos')
+
 
 class Voto(Base):
     __tablename__ = 'voto'

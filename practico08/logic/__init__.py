@@ -1,5 +1,7 @@
 from practico08.data import CapaDatos
 from practico08.data.models import Usuario, Voto
+
+
 async def init_logic(app):
     logica = Logic()
     app['logic'] = logica
@@ -15,13 +17,36 @@ class Logic():
     def alta_usuario(self, usuario):
         """
         Comprueba al usuario, lo guarda y lo devuelve . Devuelve None si no pasa la comprobacion
+        Y comprueba las reglas
         :type user:Usuario
         :rtype: Usuario
         """
-        p = None
-        if not self.buscar_usuario_por_nombre(usuario.nombre):
-            p = self.datos.alta_usuario(usuario)
-        return p
+
+        try:
+
+            if not self.isUsuarioRepetido(usuario.nombre) and self.isLongitudValida(usuario.nombre):
+                p = self.datos.alta_usuario(usuario)
+                if p:
+                    return p
+                else:
+                    return False
+            else:
+                False
+        except Exception as e:
+            return e
+
+    def isUsuarioRepetido(self,nombre):
+        if self.buscar_usuario_por_nombre(nombre):
+            return True
+        else:
+            raise UsuarioRepetido("usuario repetido")
+
+    def isLongitudValida(self,nombre):
+        long = len(nombre)
+        if 20 > long > 6:
+            return True
+        else:
+            raise UsuarioLongitudInvalida("Longitud invalida")
 
     def buscar_usuario_por_id(self, id):
         """
@@ -68,5 +93,15 @@ class Logic():
         s = self.datos.buscar_sala_por_link(link)
         return s
 
-    def alta_voto(self, id_usuario, id_votacion, id_cancion):
-        pass
+    def alta_voto(self, voto):
+        v = self.datos.alta_voto(voto)
+
+
+class UsuarioRepetido(Exception):
+    pass
+
+
+class UsuarioLongitudInvalida(Exception):
+    pass
+
+

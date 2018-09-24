@@ -1,6 +1,6 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from practico08.data.models import Base, Usuario, Sala
+from practico08.data.models import Base, Usuario, Sala, Voto
 
 
 class CapaDatos():
@@ -71,6 +71,16 @@ class CapaDatos():
         """
         s = self.session.query(Sala).filter(Sala.link_invitacion == link_invitacion).first()
         return s
+
+    def alta_voto(self, voto):
+        """
+        Da de alta un voto si no puede devuelve none
+        :type voto: Voto
+        :rtype:Voto
+        """
+        self.session.add(voto)
+        self.session.commit(voto)
+        return voto
 
 
 def test():
