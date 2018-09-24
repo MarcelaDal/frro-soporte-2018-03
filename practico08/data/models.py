@@ -15,7 +15,7 @@ class Usuario(Base):
     #salas = relationship('Sesion', secondary=Sesion, lazy='subquery',
      #                    backref=backref('usuarios', lazy=True))
 
-    votos = relationship('Voto', uselist=True, backref='votos')
+    #votos = relationship('Voto', uselist=True, backref='votos')
 
 
 class Sala(Base):
@@ -42,7 +42,7 @@ class Votacion(Base):
     tiempo_vida = Column(Integer) #Esto por como funciona ahora se podria sascar
     id_sala = Column(Integer, ForeignKey('sala.id'))
 
-    votos = relationship('voto', uselist=True, backref='votos')
+    #votos = relationship('voto', uselist=True, backref='votos')
 
 
 class Voto(Base):

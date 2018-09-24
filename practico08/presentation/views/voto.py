@@ -35,7 +35,7 @@ def votar(request):
             votacion = logic.alta_votacion(Votacion(id_sala=sala.id, tiempo_vida=30))
             request.app['horario'].spawn(lanzar_votacion(sala, votacion, request.app))
         voto = logic.alta_voto(Voto(id_usuario=usuario.id, id_votacion=sala.votacion_vijente, id_cancion=cancion))
-        if(voto):
+        if voto:
             return json_response(status=200, data={"id_voto": voto.id})
     else:
         return json_response(status=400, data={"error":"bad requests"})
@@ -60,7 +60,7 @@ async def lanzar_votacion(sala, votacion, app):
         tiempo_vida = (int(reproduccion_actual_json['item']['duration_ms']) - int(reproduccion_actual_json['progress_ms'])) / 1000 - 10
         await asyncio.sleep(tiempo_vida)
         sala = app['logic'].buscar_sala_por_id(sala.id)
-        cancion = app['logic'].obtener_resultado_de_votacion(votacion)
+        cancion = app['logic'].obtener_resultado_de_votacion(votacion, sala)
         # Cambiar la cancion
         await session.post('https://api.spotify.com/v1/playlists/' + sala.playlist_id + '/tracks',
                                 headers={

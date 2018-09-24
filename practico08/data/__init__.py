@@ -103,6 +103,12 @@ class CapaDatos():
         self.session.commit(voto)
         return voto
 
+    def modificar_sala(self, sala):
+        s = self.buscar_sala_por_id(sala.id)
+        s.votacion_vigente = sala.votacion_vigente
+        s.link_invitacion = sala.link_invitacion
+        self.session.commit()
+
 
 def test():
     datos = CapaDatos()

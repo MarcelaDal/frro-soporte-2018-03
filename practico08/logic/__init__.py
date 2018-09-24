@@ -7,7 +7,7 @@ async def init_logic(app):
     app['logic'] = logica
 
 
-class Logic():
+class Logic:
     """
     Clase que encapsula toda la logica
     """
@@ -24,26 +24,24 @@ class Logic():
 
         try:
 
-            if not self.isUsuarioRepetido(usuario.nombre) and self.isLongitudValida(usuario.nombre):
+            if self.isUsuarioUnico(usuario.nombre) and self.isLongitudValida(usuario.nombre):
+                print('Holis')
                 p = self.datos.alta_usuario(usuario)
-                if p:
-                    return p
-                else:
-                    return False
+                return p
             else:
                 return False
         except Exception as e:
             return e
 
-    def isUsuarioRepetido(self,nombre):
-        if self.buscar_usuario_por_nombre(nombre):
+    def isUsuarioUnico(self,nombre):
+        if not self.buscar_usuario_por_nombre(nombre):
             return True
         else:
             raise UsuarioRepetido("usuario repetido")
 
     def isLongitudValida(self,nombre):
         long = len(nombre)
-        if 20 > long > 6:
+        if 20 >= long >= 6:
             return True
         else:
             raise UsuarioLongitudInvalida("Longitud invalida")
@@ -77,12 +75,14 @@ class Logic():
         :type usuario:Usuario
         :rtype: Usuario
         """
-        #if(isOk)
-        u = self.datos.modificar_usuario(usuario)
-        return u
-    """
-    Guarda una sala
-    """
+        try:
+
+            if self.isUsuarioUnico(usuario.nombre) and self.isLongitudValida(usuario.nombre):
+                p = self.datos.modificar_usuario(usuario)
+                return p
+        except Exception as e:
+            return e
+
     def alta_sala(self, sala):
         s = None
         #validar que tiene una sala activa a la vez?
@@ -101,9 +101,15 @@ class Logic():
     def alta_voto(self, voto):
         v = self.datos.alta_voto(voto)
 
-    def obtener_resultado_votacion(self, votacion):
+    def obtener_resultado_votacion(self, votacion, sala):
         resultado = Counter([voto.id_cancion for voto in self.votos_get_all(votacion.id)]).most_common(1)[0][0]
         self.baja_votacion(votacion.id)
+        sala.votacion_vigente = 0
+        self.modificar_sala(sala)
+        return resultado
+
+    def modificar_sala(self, sala):
+        self.datos.modificar_sala(sala)
 
     def buscar_votacion_por_id(self,id):
         """

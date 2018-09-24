@@ -33,7 +33,7 @@ class Auth(web.View):
             else:
                 return web.Response(status=200, text="Usuario registrado")
         else:
-            return web.json_response(status=400, text=usuario)
+            return web.json_response(status=400, text=str(usuario))
 
     """
     No se que tan buena practica es implementarlo asi pero bue..., puse el retorno al que llamaria spotify dentro del misma entrada pero por get
@@ -58,6 +58,7 @@ class Auth(web.View):
                         user.token = text['access_token']
                         user.refresh_token = text['refresh_token']
                         user = logic.modificar_usuario(user)
+                        print(user)
                         miresp = web.Response(status=200, text='Se ha registrado usuario')
                         return miresp
         return web.Response(status=502)
