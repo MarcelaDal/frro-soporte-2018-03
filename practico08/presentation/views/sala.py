@@ -15,8 +15,8 @@ async def crear_sala(request):
     if not req.get('id_admin'):
         return web.Response(text='Bad Request', status=400)
     id_admin = req.get('id_admin')
-    logic = request.app['logic']
-    usuario = logic.buscar_usuario_por_id(id_admin)
+    logicUsuario = request.app['logic'].usuario
+    usuario = logicUsuario.buscar_usuario_por_id(id_admin)
     if type(usuario) == Usuario:
         nueva_sala = Sala()
         nueva_sala.id_admin = usuario.id
@@ -36,7 +36,8 @@ async def crear_sala(request):
                                        ) as resp:
                     text = await resp.json()
                     nueva_sala.id_playlist = text['id']
-                    sala = logic.alta_sala(nueva_sala)
+                    logicSala = request.app['logic'].sala
+                    sala = logicSala.alta_sala(nueva_sala)
                     miresp = web.Response(status=200, text="Sala creada")
                     return miresp
             #return web.Response(text="Sala creada")
@@ -46,7 +47,7 @@ async def crear_sala(request):
 async def obtener_sala_por_link(request):
     code = request.match_info['link_invitacion']
     if code:
-        logic = request.app['logic']
+        logic = request.app['logic'].sala
         sala = logic.buscar_sala_por_codigo(code)
         miresp = web.json_response(status=200, data={"id_sala": sala.id, "id_admin": sala.id_admin})
         return miresp

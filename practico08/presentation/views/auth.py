@@ -22,7 +22,7 @@ class Auth(web.View):
         nuevo_usuario = Usuario()
         nuevo_usuario.nombre = nombre
         nuevo_usuario.id_usuario_spotify = self.request.app['config']['client_id']
-        logic = self.request.app['logic']
+        logic = self.request.app['logic'].usuario
         usuario = logic.alta_usuario(nuevo_usuario)
         if type(usuario) == Usuario:
             if req.get('hasSpotify') and not (usuario.token or usuario.refresh_token):
@@ -57,7 +57,7 @@ class Auth(web.View):
                                               'client_secret': self.request.app['config']['secret_id']}) as resp:
                     if resp.status == 200:
                         text = await resp.json()
-                        logic = self.request.app.get('logic')
+                        logic = self.request.app.get('logic').usuario
                         user = logic.buscar_usuario_por_id(state)
                         user.token = text['access_token']
                         user.refresh_token = text['refresh_token']
