@@ -50,4 +50,6 @@ async def obtener_sala_por_link(request):
         sala = logic.buscar_sala_por_codigo(code)
         miresp = web.json_response(status=200, data={"id_sala": sala.id, "id_admin": sala.id_admin})
         return miresp
+    else:
+        return web.Response(status=400)
 
