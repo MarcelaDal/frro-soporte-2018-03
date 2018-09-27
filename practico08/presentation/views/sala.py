@@ -1,7 +1,7 @@
 from urllib.parse import urlencode
 from aiohttp import web, ClientSession
 from practico08.util import getRandomsString
-from practico08.data.models import Sala, Usuario
+from practico08.data.models import Sala, Usuario, Sesion
 from practico08.presentation import Routes
 from practico08.util import getRandomsString
 
@@ -77,3 +77,28 @@ async def obtener_sala_por_link(request):
         return miresp
     else:
         return web.Response(status=400)
+<<<<<<< HEAD
+=======
+
+
+@Routes.post("/sala/add")
+async def aniadir_usuario_sala(requests):
+    req = await requests.json()
+    id_sala = req.get("id_sala")
+    if not id_sala:
+        return web.json_response(status=400, data={"error":"Falta pararmetro id_sala"})
+    id_usuario = req.get("id_usuario")
+    if not id_usuario:
+        return web.json_response(status=400, data={"error":"Falta pararmetro id_usuario"})
+    usuario = requests.app['logic'].usuario.buscar_usuario_por_id(id_usuario)
+    if not usuario:
+        return web.json_response(status=400, data={"error":"Usuario invalido"})
+    sala = requests.app['logic'].sala.buscar_sala_por_id(id_sala)
+    if not sala:
+        return web.json_response(status=400, data={"error":"Sala invalida"})
+    sesion = requests.app['logic'].sesion.alta_sesion(Sesion(id_sala=id_sala,id_usuario=id_usuario))
+    if sesion:
+        return web.Response(status=200)
+    else:
+        return web.json_response(status=200, data={"error":"intente mas tarde"})
+>>>>>>> practico08

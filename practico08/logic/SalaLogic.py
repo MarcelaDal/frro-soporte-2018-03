@@ -27,3 +27,5 @@ class SalaLogic(Logic):
     def modificar_sala(self, sala):
         sala = self.datos.modificar_sala(sala)
         return sala
+
+
