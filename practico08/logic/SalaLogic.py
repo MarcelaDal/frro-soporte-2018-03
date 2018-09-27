@@ -11,6 +11,10 @@ class SalaLogic(Logic):
         s = self.datos.alta_sala(sala)
         return s
 
+    def buscar_sala_por_id(self, id):
+        s = self.datos.buscar_sala_por_id(id)
+        return s
+
     def buscar_sala_por_codigo(self, link):
         """
         Busca una sala por link de invitacion. Si no lo encuentra devuelve None
@@ -21,4 +25,5 @@ class SalaLogic(Logic):
         return s
 
     def modificar_sala(self, sala):
-        self.datos.modificar_sala(sala)
+        sala = self.datos.modificar_sala(sala)
+        return sala

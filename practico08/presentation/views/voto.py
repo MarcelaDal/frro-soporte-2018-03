@@ -5,6 +5,7 @@ from aiohttp.web import Request, json_response
 import asyncio
 from practico08.logic import LogicController
 
+
 @Routes.post('/voto')
 async def votar(request):
     """
@@ -30,14 +31,14 @@ async def votar(request):
         # session = logic.buscar_session(usuario.id, sala.id)
         # if not session:
         #     return json_response(status=400, data={"error":"no hay session"})
-        """
-        Aca iria el post al voto
-        Copiar la parte de ClientSession en auth y buscar en la referencia de la api de spotift como buscar una cancion :D
-        """
-        if not sala.votacion_vijente:
-            votacion = logicVoto.alta_votacion(Votacion(id_sala=sala.id, tiempo_vida=30))
-            request.app['horario'].spawn(lanzar_votacion(sala, votacion, request.app))
-        voto = logicVoto.alta_voto(Voto(id_usuario=usuario.id, id_votacion=sala.votacion_vijente, id_cancion=cancion))
+        votacion = logicVoto.buscar_votacion_por_id_sala(sala.id)
+        print(sala.votacion_vigente)
+        if not sala.votacion_vigente:
+            votacion = logicVoto.alta_votacion(Votacion(id_sala=sala.id, tiempo_vida=0))
+            sala.votacion_vigente = True
+            sala = logicSala.modificar_sala(sala)
+            job = await request.app['horario'].spawn(lanzar_votacion(sala, votacion, request.app))
+        voto = logicVoto.alta_voto(Voto(id_usuario=usuario.id, id_votacion=votacion.id, id_cancion=cancion))
         if voto:
             return json_response(status=200, data={"id_voto": voto.id})
     else:
@@ -50,8 +51,6 @@ async def lanzar_votacion(sala, votacion, app):
     :type logic: LogicController
     :type votacion:Votacion
     """
-    # Ver spotify para ver cuanto tiempo queda y calcular el tiempo de vida
-    # Despues agregar aca el tiempo de vida la posicion de la siguiente cancion, etc
     user = app['logic'].usuario.buscar_usuario_por_id_sala(sala.id)
     auth_str = "Authorization: Bearer " + user.token
     async with ClientSession() as session:
@@ -62,15 +61,33 @@ async def lanzar_votacion(sala, votacion, app):
         reproduccion_actual_json = await reproduccion_actual.json()
         tiempo_vida = (int(reproduccion_actual_json['item']['duration_ms']) - int(reproduccion_actual_json['progress_ms'])) / 1000 - 10
         await asyncio.sleep(tiempo_vida)
-        sala = app['logic'].buscar_sala_por_id(sala.id)
-        cancion = app['logic'].obtener_resultado_de_votacion(votacion, sala)
-        # Cambiar la cancion
-        await session.post('https://api.spotify.com/v1/playlists/' + sala.id_playlist + '/tracks',
+        sala = app['logic'].sala.buscar_sala_por_id(sala.id)
+        cancion = app['logic'].obtener_resultado_votacion(votacion, sala)
+        print(cancion)
+        resp = await session.post('https://api.spotify.com/v1/playlists/' + sala.id_playlist + '/tracks',
                                 headers={
                                     'Authorization': auth_str,
                                     'Content-Type': 'application/json'
                                 },
                                 json={
-                                    'uris': [cancion],
-                                    'position': 3
+                                    'uris': [cancion[0]],
+                                    'position': cancion[1]
                                 })
+        json_resp = await resp.json()
+        print(json_resp)
+
+
+@Routes.post('/add')
+async def add(request):
+    async with ClientSession() as session:
+        async with session.post('https://api.spotify.com/v1/playlists/3XHCgLC96373KxA6bVeh4s/tracks',
+                                headers={
+                                    'Authorization': "Authorization: Bearer BQCtIbzspAmhxxOOwrsF1FW8FQ8TILKLyoX0zvYv9NCHW7D6WqS-hJHtCevq06n48jEw_yxgw2K0SLCaqLbioxd7hMqi1pRCZDYR2CaJxW0NpcYrapDna8MEGsueieIVVpinOKZsWp_-ggDZXbtqHKBPjwHQ6jYwEFhwIVj48OETt4nVAOoI1fw3o6pgaImp6fwGaoHPI3em27JVTcDoHqCGHw",
+                                    'Content-Type': 'application/json'
+                                },
+                                json={
+                                    'uris': ["spotify:track:5ghIJDpPoe3CfHMGu71E6T"],
+                                    'position': 0
+                                }) as resp:
+            resp_json = await resp.json()
+            return json_response(data=resp_json)

@@ -56,7 +56,7 @@ class UsuarioLogic(Logic):
 
     def buscar_usuario_por_id_sala(self, id_sala):
         sala = self.datos.buscar_sala_por_id(id_sala)
-        user = self.datos.buscar_usuario_por_id(sala.id)
+        user = self.datos.buscar_usuario_por_id(sala.id_admin)
         return user
 
     def modificar_usuario(self, usuario):

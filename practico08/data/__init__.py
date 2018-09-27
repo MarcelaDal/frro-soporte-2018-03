@@ -43,6 +43,10 @@ class CapaDatos():
         v = self.session.query(Votacion).filter(Votacion.id == id).first()
         return v
 
+    def buscar_votacion_por_id_sala(self, id_sala):
+        v = self.session.query(Votacion).filter(Votacion.id_sala == id_sala).first()
+        return v
+
     def votos_get_all(self, id):
         votos = self.session.query(Voto).filter(Voto.id_votacion ==id).all()
         return votos
@@ -100,7 +104,7 @@ class CapaDatos():
         :rtype:Voto
         """
         self.session.add(voto)
-        self.session.commit(voto)
+        self.session.commit()
         return voto
 
     def modificar_sala(self, sala):
@@ -108,7 +112,12 @@ class CapaDatos():
         s.votacion_vigente = sala.votacion_vigente
         s.link_invitacion = sala.link_invitacion
         self.session.commit()
+        return s
 
+    def alta_votacion(self, votacion):
+        self.session.add(votacion)
+        self.session.commit()
+        return votacion
 
 def test():
     datos = CapaDatos()

@@ -4,6 +4,7 @@ from practico08.logic.UsuarioLogic import UsuarioLogic
 from practico08.logic.SalaLogic import SalaLogic
 from practico08.logic.VotoLogic import VotoLogic
 from collections import Counter
+from urllib.parse import unquote
 
 
 async def init_logic(app):
@@ -24,11 +25,12 @@ class LogicController:
 
 
     def obtener_resultado_votacion(self, votacion, sala):
-        resultado = Counter([voto.id_cancion for voto in self.voto.votos_get_all(votacion.id)]).most_common(1)[0][0]
+        resultado = unquote(Counter([voto.id_cancion for voto in self.voto.votos_get_all(votacion.id)]).most_common(1)[0][0])
         self.voto.baja_votacion(votacion.id)
-        sala.votacion_vigente = 0
+        sala.votacion_vigente = False
+        sala.puntero += 1
         self.sala.modificar_sala(sala)
-        return resultado
+        return resultado, sala.puntero - 1
 
 
 
