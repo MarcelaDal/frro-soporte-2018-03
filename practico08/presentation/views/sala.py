@@ -11,10 +11,13 @@ async def crear_sala(request):
     """
    Crear nueva sala
     """
+    # pasar los datos de la playlist en el body
     req = await request.json()
     if not req.get('id_admin'):
         return web.Response(text='Bad Request', status=400)
     id_admin = req.get('id_admin')
+    playlist_name = req.get('playlist_name')
+    playlist_description = req.get('playlist_description')
     logicUsuario = request.app['logic'].usuario
     usuario = logicUsuario.buscar_usuario_por_id(id_admin)
     if type(usuario) == Usuario:
@@ -29,8 +32,8 @@ async def crear_sala(request):
                                             'Authorization': 'Bearer ' + usuario.token
                                         },
                                         json={
-                                            'name': 'New Playlist',
-                                            'description': 'New playlist description',
+                                            'name': playlist_name,
+                                            'description': playlist_description,
                                             'public': 'false'
                                         }
                                        ) as resp:
