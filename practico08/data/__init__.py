@@ -1,6 +1,6 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from practico08.data.models import Base, Usuario, Sala, Voto, Votacion
+from practico08.data.models import Base, Usuario, Sala, Voto, Votacion, Sesion
 
 
 class CapaDatos():
@@ -118,6 +118,16 @@ class CapaDatos():
         self.session.add(votacion)
         self.session.commit()
         return votacion
+
+    def alta_sesion(self, sesion):
+        self.session.add(sesion)
+        self.session.commit()
+        return sesion
+
+    def buscar_sesion(self, id_usuario, id_sala):
+        sesion = self.session.query(Sesion).filter(Sesion.id_sala == id_sala and Sesion.id_usuario == id_sala).first()
+        return sesion
+
 
 def test():
     datos = CapaDatos()

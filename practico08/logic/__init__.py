@@ -3,6 +3,7 @@ from practico08.data.models import Usuario, Voto, Sala, Votacion
 from practico08.logic.UsuarioLogic import UsuarioLogic
 from practico08.logic.SalaLogic import SalaLogic
 from practico08.logic.VotoLogic import VotoLogic
+from practico08.logic.SesionLogic import SesionLogic
 from collections import Counter
 from urllib.parse import unquote
 
@@ -21,8 +22,7 @@ class LogicController:
         self.usuario = UsuarioLogic(datos=self.datos)
         self.sala = SalaLogic(datos=self.datos)
         self.voto = VotoLogic(datos=self.datos)
-
-
+        self.sesion = SesionLogic(datos=self.datos)
 
     def obtener_resultado_votacion(self, votacion, sala):
         resultado = unquote(Counter([voto.id_cancion for voto in self.voto.votos_get_all(votacion.id)]).most_common(1)[0][0])
