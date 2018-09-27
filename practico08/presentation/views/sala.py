@@ -46,6 +46,27 @@ async def crear_sala(request):
             #return web.Response(text="Sala creada")
             #return web.Response(text="No se ha podido crear una nueva sala. Intente más tarde.")
 
+
+@Routes.get("/sala/buscar_canciones")
+async def buscar_canciones(request):
+    req = request.rel_url
+    keywords = req.get('keywords')
+    if keywords:
+        async with ClientSession() as session:
+            query = ""
+            async with session.get('https://api.spotify.com/v1/search?q=abba&type=track&market=US',
+                                   headers={'Content-Type': 'application/json',
+                                       #ver autorizacion
+                                            'Authorization': 'Bearer ' + request.app['token']
+                                            }) as resp:
+                    text = await resp.json()
+                    miresp = web.json_response(status=200, data=text)
+                    return miresp
+
+    else:
+        return web.Response(status=400)
+
+
 @Routes.get("/sala/{link_invitacion}")
 async def obtener_sala_por_link(request):
     code = request.match_info['link_invitacion']
@@ -56,4 +77,3 @@ async def obtener_sala_por_link(request):
         return miresp
     else:
         return web.Response(status=400)
-
