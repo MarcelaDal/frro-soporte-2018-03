@@ -16,9 +16,9 @@ class Auth(web.View):
 
     async def post(self):
         req = await self.request.json()
-        if not req.get('nombre'):
-            return web.Response(status=400, text='sin nombre')  # Modificar eso XD
         nombre = req.get('nombre')
+        if not nombre:
+            return web.json_response(status=400, data={'message': 'Bad Request'})
         nuevo_usuario = Usuario()
         nuevo_usuario.nombre = nombre
         nuevo_usuario.id_usuario_spotify = self.request.app['config']['client_id']
@@ -34,9 +34,9 @@ class Auth(web.View):
                                                                              'state': str(usuario.id)
                                                                              })})
             else:
-                return web.Response(status=200, text="Usuario registrado")
+                return web.json_response(status=200, data={'message': 'Usuario registrado con éxito'})
         else:
-            return web.json_response(status=400, text=str(usuario))
+            return web.json_response(status=500, data={'message': 'Se produjo un error.'})
 
 
     """
@@ -67,6 +67,10 @@ class Auth(web.View):
                         user_data_json = await user_data.json()
                         user.id_usuario_spotify = user_data_json['id']
                         user = logic.modificar_usuario(user)
-                        miresp = web.Response(status=200, text='Se ha registrado usuario')
-                        return miresp
-        return web.Response(status=502)
+                        if type(user) == Usuario:
+                            return web.json_response(status=200, text={'message': 'Usuario registrado con éxito!', 'error':False})
+                        else:
+                            return web.json_response(status=500, text={'message': 'Se produjo un error.', 'error': True})
+
+        else:
+            return web.json_response(status=400, data={'message': 'Bad Request', 'error':True})
