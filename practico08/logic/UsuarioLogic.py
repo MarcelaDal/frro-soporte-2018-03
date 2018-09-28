@@ -43,7 +43,10 @@ class UsuarioLogic(Logic):
         :rtype: Usuario
         """
         u = self.datos.buscar_usuario_por_id(id)
-        return u
+        if u:
+            return u
+        else:
+            return False
 
     def buscar_usuario_por_nombre(self, nombre):
         """
@@ -52,7 +55,10 @@ class UsuarioLogic(Logic):
         :rtype: Usuario
         """
         u = self.datos.buscar_usuario_por_nombre(nombre)
-        return u
+        if u:
+            return u
+        else:
+            return False
 
     def buscar_usuario_por_id_sala(self, id_sala):
         sala = self.datos.buscar_sala_por_id(id_sala)
@@ -66,7 +72,6 @@ class UsuarioLogic(Logic):
         :rtype: Usuario
         """
         try:
-
             if self.isUsuarioUnico(usuario.nombre) and self.isLongitudValida(usuario.nombre):
                 p = self.datos.modificar_usuario(usuario)
                 return p

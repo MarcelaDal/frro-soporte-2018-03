@@ -11,4 +11,7 @@ class SesionLogic(Logic):
 
     def buscar_sesion(self, id_usuario, id_sala):
         s = self.datos.buscar_sesion(id_usuario, id_sala)
-        return s
+        if s:
+            return s
+        else:
+            return False

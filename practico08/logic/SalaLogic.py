@@ -7,13 +7,19 @@ class SalaLogic(Logic):
 
     def alta_sala(self, sala):
         s = None
-        #validar que tiene una sala activa a la vez?
+        # TODO validar que tiene una sala activa a la vez?
         s = self.datos.alta_sala(sala)
-        return s
+        if s:
+            return s
+        else:
+            return False
 
     def buscar_sala_por_id(self, id):
         s = self.datos.buscar_sala_por_id(id)
-        return s
+        if s:
+            return s
+        else:
+            return False
 
     def buscar_sala_por_codigo(self, link):
         """
@@ -22,7 +28,10 @@ class SalaLogic(Logic):
         :rtype: Usuario
         """
         s = self.datos.buscar_sala_por_link(link)
-        return s
+        if s:
+            return s
+        else:
+            return False
 
     def modificar_sala(self, sala):
         sala = self.datos.modificar_sala(sala)
