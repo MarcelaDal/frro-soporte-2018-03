@@ -125,7 +125,7 @@ class CapaDatos():
         return sesion
 
     def buscar_sesion(self, id_usuario, id_sala):
-        sesion = self.session.query(Sesion).filter(Sesion.id_sala == id_sala and Sesion.id_usuario == id_sala).first()
+        sesion = self.session.query(Sesion).filter(Sesion.id_sala == id_sala and Sesion.id_usuario == id_usuario).first()
         return sesion
 
 
