@@ -94,8 +94,6 @@ async def aniadir_usuario_sala(requests):
     id_usuario = req.get("id_usuario")
     if not id_sala or not id_usuario:
         return web.json_response(status=400, data={"message": "Bad Request"})
-    #if not id_usuario:
-    #    return web.json_response(status=400, data={"error":"Falta pararmetro id_usuario"})
     usuario = requests.app['logic'].usuario.buscar_usuario_por_id(id_usuario)
     if not usuario:
         return web.json_response(status=400, data={"message": "No existe usuario con ese id."})

@@ -1,11 +1,18 @@
-from practico08.logic.Logic import Logic
+from practico08.data import DatosUsuarios
+from practico08.logic import LogicSingleton
+from practico08.logic.LogicSala import LogicSala
 
 
-class UsuarioLogic(Logic):
-    def __init__(self, datos):
-        super().__init__(datos)
+class UsuarioRepetido(Exception):
+    pass
 
-    def alta_usuario(self, usuario):
+
+class UsuarioLongitudInvalida(Exception):
+    pass
+
+
+class LogicUsuario(LogicSingleton):
+    def alta(self, usuario):
         """
         Comprueba al usuario, lo guarda y lo devuelve . Devuelve None si no pasa la comprobacion
         Y comprueba las reglas
@@ -16,7 +23,7 @@ class UsuarioLogic(Logic):
         try:
 
             if self.isUsuarioUnico(usuario.nombre) and self.isLongitudValida(usuario.nombre):
-                p = self.datos.alta_usuario(usuario)
+                p = DatosUsuarios().alta(usuario)
                 return p
             else:
                 return False
@@ -24,7 +31,7 @@ class UsuarioLogic(Logic):
             return e
 
     def isUsuarioUnico(self,nombre):
-        if not self.buscar_usuario_por_nombre(nombre):
+        if not self.buscar_por_nombre(nombre):
             return True
         else:
             raise UsuarioRepetido("usuario repetido")
@@ -36,36 +43,36 @@ class UsuarioLogic(Logic):
         else:
             raise UsuarioLongitudInvalida("Longitud invalida")
 
-    def buscar_usuario_por_id(self, id):
+    def buscar_por_id(self, id):
         """
         Busca un usuario por id y lo devuelve. Si no lo encuentra devuelve None
         :type id:int
         :rtype: Usuario
         """
-        u = self.datos.buscar_usuario_por_id(id)
+        u = DatosUsuarios().buscar_por_id(id)
         if u:
             return u
         else:
             return False
 
-    def buscar_usuario_por_nombre(self, nombre):
+    def buscar_por_nombre(self, nombre):
         """
         Busca un usuario por nombre
         :type nombre: str
         :rtype: Usuario
         """
-        u = self.datos.buscar_usuario_por_nombre(nombre)
+        u = DatosUsuarios().buscar_por_nombre(nombre)
         if u:
             return u
         else:
             return False
 
-    def buscar_usuario_por_id_sala(self, id_sala):
-        sala = self.datos.buscar_sala_por_id(id_sala)
-        user = self.datos.buscar_usuario_por_id(sala.id_admin)
+    def buscar_por_id_sala(self, id_sala):
+        sala = LogicSala().buscar_por_id(id_sala)
+        user = DatosUsuarios().buscar_por_id(sala.id_admin)
         return user
 
-    def modificar_usuario(self, usuario):
+    def modificar(self, usuario):
         """
         Modifica un usuario realizando las comprobaciones correspondientes
         :type usuario:Usuario
@@ -73,15 +80,13 @@ class UsuarioLogic(Logic):
         """
         try:
             if self.isUsuarioUnico(usuario.nombre) and self.isLongitudValida(usuario.nombre):
-                p = self.datos.modificar_usuario(usuario)
+                p = DatosUsuarios().modificar(usuario)
                 return p
         except Exception as e:
             return e
 
 
-class UsuarioRepetido(Exception):
-    pass
-
-
-class UsuarioLongitudInvalida(Exception):
-    pass
+if __name__ == '__main__':
+    from practico08.data import Usuario
+    user = LogicUsuario().alta(Usuario(nombre="Totito"))
+    print(user)

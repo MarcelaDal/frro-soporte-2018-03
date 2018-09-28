@@ -2,7 +2,7 @@ from urllib.parse import urlencode
 from aiohttp import web, ClientSession
 from practico08.data.models import Usuario, Sala
 from practico08.presentation import Routes
-
+from practico08.logic import LogicUsuario
 
 @Routes.view("/auth")
 class Auth(web.View):
@@ -22,8 +22,8 @@ class Auth(web.View):
         nuevo_usuario = Usuario()
         nuevo_usuario.nombre = nombre
         nuevo_usuario.id_usuario_spotify = self.request.app['config']['client_id']
-        logic = self.request.app['logic'].usuario
-        usuario = logic.alta_usuario(nuevo_usuario)
+        logic = LogicUsuario()
+        usuario = logic.alta(nuevo_usuario)
         if type(usuario) == Usuario:
             if req.get('hasSpotify') and not (usuario.token or usuario.refresh_token):
                 return web.json_response(status=200, data={"url": 'https://accounts.spotify.com/authorize?' +
@@ -37,12 +37,6 @@ class Auth(web.View):
                 return web.json_response(status=200, data={'message': 'Usuario registrado con éxito'})
         else:
             return web.json_response(status=500, data={'message': 'Se produjo un error.'})
-
-
-    """
-    No se que tan buena practica es implementarlo asi pero bue..., puse el retorno al que llamaria spotify dentro del misma entrada pero por get
-    Basicamente hace el post a spotify le agrega el el token a al usuario y le creamos una sala
-    """
 
     async def get(self):
         code = self.request.rel_url.query.get('code')
@@ -68,9 +62,9 @@ class Auth(web.View):
                         user.id_usuario_spotify = user_data_json['id']
                         user = logic.modificar_usuario(user)
                         if type(user) == Usuario:
-                            return web.json_response(status=200, text={'message': 'Usuario registrado con éxito!', 'error':False})
+                            return web.json_response(status=200, text={'message': 'Usuario registrado con éxito!', 'error': False})
                         else:
                             return web.json_response(status=500, text={'message': 'Se produjo un error.', 'error': True})
 
         else:
-            return web.json_response(status=400, data={'message': 'Bad Request', 'error':True})
+            return web.json_response(status=400, data={'message': 'Bad Request', 'error': True})
