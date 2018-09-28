@@ -17,6 +17,8 @@ async def votar(request):
     cancion = req.get('cancion')
     sala_id = req.get('sala')
     usuario_id = req.get('usuario')
+    if not cancion or not sala_id or not usuario_id:
+        return json_response(status=400, data={"error":True, 'message': 'Bad Request'})
     if cancion and sala_id and usuario_id:
         logic = request.app['logic']
         logicUsuario = logic.usuario
@@ -24,15 +26,16 @@ async def votar(request):
         logicVoto = logic.voto
         usuario = logicUsuario.buscar_usuario_por_id(usuario_id)
         if not usuario:
-            return json_response(status=400,data={'error':'usuario no registrado'})
+            return json_response(status=400, data={'message': 'No existe usuario registrado con ese id.'})
         sala = logicSala.buscar_sala_por_id(sala_id)
         if not sala:
-            return json_response(status=400, data={"error":"sala inexistente"})
+            return json_response(status=400, data={'message': 'No existe sala registrada con ese id.'})
         session = request.app['logic'].sesion.buscar_sesion(usuario.id, sala.id)
         if not session:
-            return json_response(status=400, data={"error":"no hay sesion"})
+            #TODO mejorar mensaje de error
+            return json_response(status=400, data={'message': "No existe sesión"})
         votacion = logicVoto.buscar_votacion_por_id_sala(sala.id)
-        print(sala.votacion_vigente)
+       #print(sala.votacion_vigente)
         if not sala.votacion_vigente:
             votacion = logicVoto.alta_votacion(Votacion(id_sala=sala.id, tiempo_vida=0))
             sala.votacion_vigente = True
@@ -40,9 +43,9 @@ async def votar(request):
             job = await request.app['horario'].spawn(lanzar_votacion(sala, votacion, request.app))
         voto = logicVoto.alta_voto(Voto(id_usuario=usuario.id, id_votacion=votacion.id, id_cancion=cancion))
         if voto:
-            return json_response(status=200, data={"id_voto": voto.id})
+            return json_response(status=200, data={'messaje': 'El voto se efectuó con éxito!', 'body': {'id_voto': voto.id}})
     else:
-        return json_response(status=400, data={"error":"bad requests"})
+        return json_response(status=400, data={'message': 'Bad Request'})
 
 
 async def lanzar_votacion(sala, votacion, app):
@@ -90,4 +93,4 @@ async def add(request):
                                     'position': 0
                                 }) as resp:
             resp_json = await resp.json()
-            return json_response(data=resp_json)
+            return json_response(code=200, data={'body': resp_json, 'message': 'Se ha agregado la canción con éxito.'})

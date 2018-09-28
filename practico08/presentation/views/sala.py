@@ -4,6 +4,7 @@ from practico08.util import getRandomsString
 from practico08.data.models import Sala, Usuario, Sesion
 from practico08.presentation import Routes
 from practico08.util import getRandomsString
+import json
 
 @Routes.post("/sala/new")
 #pasa en el body el id del admin
@@ -13,9 +14,9 @@ async def crear_sala(request):
     """
     # pasar los datos de la playlist en el body
     req = await request.json()
-    if not req.get('id_admin'):
-        return web.Response(text='Bad Request', status=400)
     id_admin = req.get('id_admin')
+    if not id_admin:
+        return web.json_response(status=400, text={'message': 'Bad Request'})
     playlist_name = req.get('playlist_name')
     playlist_description = req.get('playlist_description')
     logicUsuario = request.app['logic'].usuario
@@ -41,30 +42,33 @@ async def crear_sala(request):
                     nueva_sala.id_playlist = text['id']
                     logicSala = request.app['logic'].sala
                     sala = logicSala.alta_sala(nueva_sala)
-                    miresp = web.Response(status=200, text="Sala creada")
-                    return miresp
-            #return web.Response(text="Sala creada")
-            #return web.Response(text="No se ha podido crear una nueva sala. Intente más tarde.")
+                    if type(sala) == Sala:
+                        return web.json_response(status=200, text={'message': 'La lista de reproducción para tu fiesta se creó con éxito!'})
+                    else:
+                        return web.json_response(status=500, data={'message': 'Se produjo un error.'})
+
+    else:
+        return web.json_response(status=500, data={'message': 'Se produjo un error.'})
 
 
 @Routes.get("/sala/buscar_canciones")
 async def buscar_canciones(request):
-    req = request.rel_url
-    keywords = req.get('keywords')
+    ''' /sala/buscar_canciones?q=abba '''
+    params = request.rel_url.query
+    keywords = params['q']
+    query = (keywords.replace(' ', '%20'))
     if keywords:
         async with ClientSession() as session:
-            query = ""
-            async with session.get('https://api.spotify.com/v1/search?q=abba&type=track&market=US',
+            #TODO ver como funciona con parámetros que tienen espacios
+            async with session.get('https://api.spotify.com/v1/search?q=' + query + '&type=track',
                                    headers={'Content-Type': 'application/json',
-                                       #ver autorizacion
+                                       #TODO ver autorizacion
                                             'Authorization': 'Bearer ' + request.app['token']
                                             }) as resp:
                     text = await resp.json()
-                    miresp = web.json_response(status=200, data=text)
-                    return miresp
-
+                    return web.json_response(status=200, data={'message': '', 'body': text, 'error': False})
     else:
-        return web.Response(status=400)
+        return web.json_response(status=400, data={'message': 'Bad Request', 'error': True})
 
 
 @Routes.get("/sala/{link_invitacion}")
@@ -73,32 +77,34 @@ async def obtener_sala_por_link(request):
     if code:
         logic = request.app['logic'].sala
         sala = logic.buscar_sala_por_codigo(code)
-        miresp = web.json_response(status=200, data={"id_sala": sala.id, "id_admin": sala.id_admin})
-        return miresp
+        if type(sala) == Sala:
+            #TODO pasar Sala a JSON
+            return web.json_response(status=200, data={'message': '', 'body': sala})
+        else:
+            return web.json_response(status=200, data={'message': 'No existe sala con ese código de invitación.', 'error': True})
+
     else:
-        return web.Response(status=400)
-<<<<<<< HEAD
-=======
+        return web.json_response(status=400, data={'message': 'Bad Request', 'error':True})
 
 
 @Routes.post("/sala/add")
 async def aniadir_usuario_sala(requests):
     req = await requests.json()
     id_sala = req.get("id_sala")
-    if not id_sala:
-        return web.json_response(status=400, data={"error":"Falta pararmetro id_sala"})
     id_usuario = req.get("id_usuario")
-    if not id_usuario:
-        return web.json_response(status=400, data={"error":"Falta pararmetro id_usuario"})
+    if not id_sala or not id_usuario:
+        return web.json_response(status=400, data={"message": "Bad Request"})
+    #if not id_usuario:
+    #    return web.json_response(status=400, data={"error":"Falta pararmetro id_usuario"})
     usuario = requests.app['logic'].usuario.buscar_usuario_por_id(id_usuario)
     if not usuario:
-        return web.json_response(status=400, data={"error":"Usuario invalido"})
+        return web.json_response(status=400, data={"message": "No existe usuario con ese id."})
     sala = requests.app['logic'].sala.buscar_sala_por_id(id_sala)
     if not sala:
-        return web.json_response(status=400, data={"error":"Sala invalida"})
+        return web.json_response(status=400, data={"message": "No existe sala con ese id."})
+
     sesion = requests.app['logic'].sesion.alta_sesion(Sesion(id_sala=id_sala,id_usuario=id_usuario))
     if sesion:
-        return web.Response(status=200)
+        return web.json_response(status=200, data={'error': False, 'message': ''})
     else:
-        return web.json_response(status=200, data={"error":"intente mas tarde"})
->>>>>>> practico08
+        return web.json_response(status=500, data={"error": True, 'message': 'Se produjo un error.'})
