@@ -19,11 +19,11 @@ class LogicVotacion(LogicSingleton):
         votacion = None
         sala = LogicSala().buscar_por_id(id_sala)
         if sala:
-            votacion = LogicVotacion().buscar_por_id_sala(sala.id)
+            votacion = DatosVotacion().buscar_por_id_sala(sala.id)
         return votacion
 
     def buscar_por_id(self, id):
-        votacion = LogicVotacion().buscar_por_id(id)
+        votacion = DatosVotacion().buscar_por_id(id)
         return votacion
 
     def baja(self, id):
