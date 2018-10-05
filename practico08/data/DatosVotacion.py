@@ -19,3 +19,26 @@ class DatosVotacion(DatosSingleton):
         self.session.add(votacion)
         self.session.commit()
         return votacion
+
+    def todos(self):
+        """
+        Devuelve
+        :return:
+        """
+        s = self.session.query(Votacion).all()
+        return s
+
+    def borrar_todos(self):
+        """
+        Borra todos los socios de la base de datos.
+        Devuelve True si el borrado fue exitoso.
+        :rtype: bool
+        """
+        try:
+            votaciones = self.todos()
+            for votacion in votaciones:
+                self.session.delete(votaciones)
+            self.session.commit()
+        except Exception:
+            return False
+        return True

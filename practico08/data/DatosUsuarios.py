@@ -13,6 +13,19 @@ class DatosUsuarios(DatosSingleton):
         self.session.commit()
         return usuario
 
+    def baja(self, usuario):
+        """
+        Da de baja un usuario
+        Devuelve True si la baja fue exitosa
+        :type usuario:int
+        :rtype:
+        """
+        try:
+            self.session.delete(usuario)
+            return True
+        except:
+            return False
+
     def buscar_por_nombre(self, nombre):
         """
         Busca un usuario por nombre y lo devuelve, devuelve None si no lo encuetra
@@ -44,3 +57,26 @@ class DatosUsuarios(DatosSingleton):
         u.refresh_token = usuario.refresh_token
         self.session.commit()
         return u
+
+    def todos(self):
+        """
+        Devuelve
+        :return:
+        """
+        s = self.session.query(Usuario).all()
+        return s
+
+    def borrar_todos(self):
+        """
+        Borra todos los socios de la base de datos.
+        Devuelve True si el borrado fue exitoso.
+        :rtype: bool
+        """
+        try:
+            usuarios = self.todos()
+            for usuario in usuarios:
+                self.baja(usuarios)
+            self.session.commit()
+        except Exception:
+            return False
+        return True

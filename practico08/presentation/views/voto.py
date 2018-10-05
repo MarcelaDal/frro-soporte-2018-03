@@ -31,9 +31,9 @@ async def votar(request):
         sala = logicSala.buscar_por_id(sala_id)
         if not sala:
             return json_response(status=400, data={'message': 'No existe sala registrada con ese id.'})
-        session = LogicSesion().buscar(usuario.id, sala.id)
+        session = logicSesion.buscar(usuario.id, sala.id)
         if not session:
-            #TODO mejorar mensaje de error
+            # TODO mejorar mensaje de error
             return json_response(status=400, data={'message': "No existe sesión"})
         votacion = logicVotacion.buscar_por_id_sala(sala.id)
         if not sala.votacion_vigente:

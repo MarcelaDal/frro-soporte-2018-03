@@ -5,3 +5,4 @@ from practico08.data.DatosSesion import DatosSesion
 from practico08.data.DatosSala import DatosSala
 from practico08.data.DatosVotacion import DatosVotacion
 from practico08.data.DatosVoto import DatosVotos
+__all__ = ['DatosUsuarios', 'DatosSesion', 'DatosVotacion', 'DatosVotos', 'DatosSala']
