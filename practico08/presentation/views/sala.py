@@ -104,7 +104,7 @@ async def aniadir_usuario_sala(requests):
 
     sesion = LogicSesion().alta(Sesion(id_sala=id_sala,id_usuario=id_usuario))
     if sesion:
-        return web.json_response(status=200, data={'message': 'Session reistrada con éxito'})
+        return web.json_response(status=200, data={'message': 'Session registrada con éxito'})
     else:
         return web.json_response(status=500, data={"error": True, 'message': 'Se produjo un error.'})
 
@@ -117,18 +117,16 @@ async def modificar_playlist(request):
     playlist_description = req.get('playlist_description')
     if not id_sala or not playlist_name or not playlist_description:
         return web.json_response(status=400, data={'message': 'Bad Request'})
-    #logic_sala = request.app['logic'].sala
-    #logicUsuario = request.app['logic'].usuario
-    sala = Sala()
+    sala = LogicSala().buscar_por_id(id_sala)
     if type(sala) == Sala:
-        #usuario = logicUsuario.buscar_usuario_por_id(sala.id_admin)
+        logicUsuario = LogicUsuario()
+        usuario = logicUsuario.buscar_usuario_por_id(sala.id_admin)
         async with ClientSession() as session:
                 id_playlist = sala.id_playlist
-                #TODO authorization
-                async with session.put('https://api.spotify.com/v1/playlists/' + 'asd',
+                async with session.put('https://api.spotify.com/v1/playlists/' + id_playlist,
                                          headers={
                                             'Content-Type': 'application/json',
-                                            'Authorization': 'Bearer asd'
+                                            'Authorization': 'Bearer ' + usuario.token
                                         },
                                         json={
                                             'name': playlist_name,
@@ -138,7 +136,6 @@ async def modificar_playlist(request):
                                        ) as resp:
                     text = await resp.json()
                     if text['error']:
-                        #TODO ->  Tomi fijate que te parece de pasar errores de spotify así. Si te parece bien la hago para todos
                         return web.json_response(status=text['error']['status'], data={'message': text['error']['message'], 'error': True})
                     else:
                         return web.json_response(status=200, data={'message': '', 'body': text, 'error': False})
