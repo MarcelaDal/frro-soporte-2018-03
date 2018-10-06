@@ -3,7 +3,6 @@ from practico08.data.models import Voto, Votacion
 from aiohttp import ClientSession
 from aiohttp.web import Request, json_response
 import asyncio
-from practico08.logic import LogicController
 
 
 @Routes.post('/voto')

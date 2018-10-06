@@ -16,7 +16,7 @@ async def crear_sala(request):
     req = await request.json()
     id_admin = req.get('id_admin')
     if not id_admin:
-        return web.json_response(status=400, text={'message': 'Bad Request'})
+        return web.json_response(status=400, data={'message': 'Bad Request'})
     playlist_name = req.get('playlist_name')
     playlist_description = req.get('playlist_description')
     logicUsuario = request.app['logic'].usuario
@@ -43,7 +43,7 @@ async def crear_sala(request):
                     logicSala = request.app['logic'].sala
                     sala = logicSala.alta_sala(nueva_sala)
                     if type(sala) == Sala:
-                        return web.json_response(status=200, text={'message': 'La lista de reproducción para tu fiesta se creó con éxito!'})
+                        return web.json_response(status=200, data={'message': 'La lista de reproducción para tu fiesta se creó con éxito!'})
                     else:
                         return web.json_response(status=500, data={'message': 'Se produjo un error.'})
 
@@ -79,12 +79,12 @@ async def obtener_sala_por_link(request):
         sala = logic.buscar_sala_por_codigo(code)
         if type(sala) == Sala:
             #TODO pasar Sala a JSON
-            return web.json_response(status=200, data={'message': '', 'body': sala})
+            return web.json_response(status=200, data={'message': '', 'body': '', 'error': False})
         else:
             return web.json_response(status=200, data={'message': 'No existe sala con ese código de invitación.', 'error': True})
 
     else:
-        return web.json_response(status=400, data={'message': 'Bad Request', 'error':True})
+        return web.json_response(status=400, data={'message': 'Bad Request', 'error': True})
 
 
 @Routes.post("/sala/add")
@@ -106,3 +106,41 @@ async def aniadir_usuario_sala(requests):
         return web.json_response(status=200, data={'error': False, 'message': ''})
     else:
         return web.json_response(status=500, data={"error": True, 'message': 'Se produjo un error.'})
+
+
+@Routes.post("/sala/playlist/modificar")
+async def modificar_playlist(request):
+    req = await request.json()
+    id_sala = req.get("id_sala")
+    playlist_name = req.get('playlist_name')
+    playlist_description = req.get('playlist_description')
+    if not id_sala or not playlist_name or not playlist_description:
+        return web.json_response(status=400, data={'message': 'Bad Request'})
+    #logic_sala = request.app['logic'].sala
+    #logicUsuario = request.app['logic'].usuario
+    sala = Sala()
+    if type(sala) == Sala:
+        #usuario = logicUsuario.buscar_usuario_por_id(sala.id_admin)
+        async with ClientSession() as session:
+                id_playlist = sala.id_playlist
+                #TODO authorization
+                async with session.put('https://api.spotify.com/v1/playlists/' + 'asd',
+                                         headers={
+                                            'Content-Type': 'application/json',
+                                            'Authorization': 'Bearer asd'
+                                        },
+                                        json={
+                                            'name': playlist_name,
+                                            'description': playlist_description,
+                                            'public': 'false'
+                                        }
+                                       ) as resp:
+                    text = await resp.json()
+                    if text['error']:
+                        #TODO ->  Tomi fijate que te parece de pasar errores de spotify así. Si te parece bien la hago para todos
+                        return web.json_response(status=text['error']['status'], data={'message': text['error']['message'], 'error': True})
+                    else:
+                        return web.json_response(status=200, data={'message': '', 'body': text, 'error': False})
+
+    else:
+        return web.json_response(status=500, data={'message': 'Se produjo un error.'})
