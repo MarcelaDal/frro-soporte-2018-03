@@ -3,10 +3,7 @@ from practico08.logic import LogicSingleton
 
 
 class LogicVoto(LogicSingleton):
-    def __init__(self, datos):
-        super().__init__(datos)
-
-    def alta_voto(self, voto):
+    def alta(self, voto):
         v = DatosVotos().alta(voto)
         return v
 

@@ -38,3 +38,26 @@ class DatosSala(DatosSingleton):
         s.link_invitacion = sala.link_invitacion
         self.session.commit()
         return s
+
+    def todos(self):
+        """
+        Devuelve
+        :return:
+        """
+        s = self.session.query(Sala).all()
+        return s
+
+    def borrar_todos(self):
+        """
+        Borra todos los socios de la base de datos.
+        Devuelve True si el borrado fue exitoso.
+        :rtype: bool
+        """
+        try:
+            salas = self.todos()
+            for sala in salas:
+                self.session.delete(sala)
+            self.session.commit()
+        except Exception:
+            return False
+        return True

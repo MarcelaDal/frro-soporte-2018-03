@@ -1,10 +1,8 @@
-from urllib.parse import urlencode
 from aiohttp import web, ClientSession
-from practico08.util import getRandomsString
-from practico08.data.models import Sala, Usuario, Sesion
+from practico08.data import Sala, Usuario, Sesion
+from practico08.logic import LogicSala, LogicUsuario, LogicSesion
 from practico08.presentation import Routes
 from practico08.util import getRandomsString
-import json
 
 @Routes.post("/sala/new")
 #pasa en el body el id del admin
@@ -19,33 +17,36 @@ async def crear_sala(request):
         return web.json_response(status=400, data={'message': 'Bad Request'})
     playlist_name = req.get('playlist_name')
     playlist_description = req.get('playlist_description')
-    logicUsuario = request.app['logic'].usuario
-    usuario = logicUsuario.buscar_usuario_por_id(id_admin)
+    logicUsuario = LogicUsuario()
+    usuario = logicUsuario.buscar_por_id(id_admin)
     if type(usuario) == Usuario:
         nueva_sala = Sala()
         nueva_sala.id_admin = usuario.id
         nueva_sala.link_invitacion = getRandomsString()
         async with ClientSession() as session:
                 id_usuario_spotify = usuario.id_usuario_spotify
+                data = {'public': 'false'}
+                data['name'] = playlist_name if playlist_name else "Spotifesta"
+                if playlist_description:
+                    data['description'] = playlist_description
                 async with session.post('https://api.spotify.com/v1/users/'+str(id_usuario_spotify)+'/playlists',
                                          headers={
                                             'Content-Type': 'application/json',
                                             'Authorization': 'Bearer ' + usuario.token
                                         },
-                                        json={
-                                            'name': playlist_name,
-                                            'description': playlist_description,
-                                            'public': 'false'
-                                        }
+                                        json=data
                                        ) as resp:
                     text = await resp.json()
-                    nueva_sala.id_playlist = text['id']
-                    logicSala = request.app['logic'].sala
-                    sala = logicSala.alta_sala(nueva_sala)
-                    if type(sala) == Sala:
-                        return web.json_response(status=200, data={'message': 'La lista de reproducción para tu fiesta se creó con éxito!'})
+                    if resp.status in [200, 201]:
+                        nueva_sala.id_playlist = str(text['id'])
+                        logicSala = LogicSala()
+                        sala = logicSala.alta(nueva_sala)
+                        if type(sala) == Sala:
+                            return web.json_response(status=200, data={'message': 'La lista de reproducción para tu fiesta se creó con éxito!'})
+                        else:
+                            return web.json_response(status=500, data={'message': 'Se produjo un error.'})
                     else:
-                        return web.json_response(status=500, data={'message': 'Se produjo un error.'})
+                        return web.json_response(status=resp.status, data=text)
 
     else:
         return web.json_response(status=500, data={'message': 'Se produjo un error.'})
@@ -75,8 +76,8 @@ async def buscar_canciones(request):
 async def obtener_sala_por_link(request):
     code = request.match_info['link_invitacion']
     if code:
-        logic = request.app['logic'].sala
-        sala = logic.buscar_sala_por_codigo(code)
+        logicSala = LogicSala()
+        sala = logicSala.busca_por_codigo(code)
         if type(sala) == Sala:
             #TODO pasar Sala a JSON
             return web.json_response(status=200, data={'message': '', 'body': '', 'error': False})
@@ -94,16 +95,16 @@ async def aniadir_usuario_sala(requests):
     id_usuario = req.get("id_usuario")
     if not id_sala or not id_usuario:
         return web.json_response(status=400, data={"message": "Bad Request"})
-    usuario = requests.app['logic'].usuario.buscar_usuario_por_id(id_usuario)
+    usuario = LogicUsuario().buscar_por_id(id_usuario)
     if not usuario:
         return web.json_response(status=400, data={"message": "No existe usuario con ese id."})
-    sala = requests.app['logic'].sala.buscar_sala_por_id(id_sala)
+    sala = LogicSala().buscar_por_id(id_sala)
     if not sala:
         return web.json_response(status=400, data={"message": "No existe sala con ese id."})
 
-    sesion = requests.app['logic'].sesion.alta_sesion(Sesion(id_sala=id_sala,id_usuario=id_usuario))
+    sesion = LogicSesion().alta(Sesion(id_sala=id_sala,id_usuario=id_usuario))
     if sesion:
-        return web.json_response(status=200, data={'error': False, 'message': ''})
+        return web.json_response(status=200, data={'message': 'Session reistrada con éxito'})
     else:
         return web.json_response(status=500, data={"error": True, 'message': 'Se produjo un error.'})
 
