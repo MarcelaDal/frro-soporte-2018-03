@@ -1,3 +1,5 @@
+from base64 import b64encode
+
 from aiohttp import web, ClientSession
 from practico08.data import Sala, Usuario, Sesion
 from practico08.logic import LogicSala, LogicUsuario, LogicSesion
@@ -21,11 +23,27 @@ async def crear_sala(request):
     playlist_description = req.get('playlist_description')
     logicUsuario = LogicUsuario()
     usuario = logicUsuario.buscar_por_nombre(nombre,password)
-    if type(usuario) == Usuario:
+    if type(usuario) == Usuario and usuario.token:
         nueva_sala = Sala()
         nueva_sala.id_admin = usuario.id
         nueva_sala.link_invitacion = getRandomsString()
         async with ClientSession() as session:
+            token_nuevo = await session.post('https://accounts.spotify.com/api/token',
+                         headers={
+                             'Authorization': 'Basic ' + b64encode((request.app['config']['client_id'] + ':' + request.app['config']['secret_id']).encode('ascii')).decode('ascii')
+                         },
+                         data={
+                             'grant_type': 'refresh_token',
+                             'refresh_token': usuario.refresh_token
+                         })
+            if token_nuevo.status != 200:
+                error = await token_nuevo.text()
+                return web.Response(text=error)
+            token_nuevo = await token_nuevo.json()
+            usuario.token = token_nuevo['access_token']
+            usuario = logicUsuario.modificar(usuario)
+            if not usuario:
+                return web.json_response(data={'eroor':'hubo bardo'})
             id_usuario_spotify = usuario.id_usuario_spotify
             data = {'public': 'false'}
             data['name'] = playlist_name if playlist_name else "Spotifesta"
@@ -185,3 +203,24 @@ async def modificar_playlist(request):
 
     else:
         return web.json_response(status=500, data={'message': 'Se produjo un error.'})
+
+if __name__ == '__main__':
+    import asyncio
+    async def main():
+        from practico08.config import config
+        usuario = LogicUsuario().buscar_por_nombre("Thomirotho","theend1969")
+        async with ClientSession() as session:
+            async with session.post('https://accounts.spotify.com/api/token',
+                                    headers={
+                                        'Authorization': 'Basic ' + b64encode((config['client_id']+':'+config['secret_id']).encode('ascii')).decode('ascii')
+                                    },
+                                    json={
+                                        'grant_type': 'refresh_token',
+                                        'refresh_token': usuario.refresh_token
+                                    }) as resp:
+                text = await resp.text()
+                print(text)
+
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
