@@ -8,6 +8,7 @@ class Usuario(Base):
 
     id = Column(Integer, autoincrement=True, primary_key=True)
     nombre = Column(String(255), unique=True)
+    password = Column(String(255))
     token = Column(String(255), nullable=True)
     refresh_token = Column(String(255), nullable=True)
     id_usuario_spotify = Column(String(255), nullable=True)

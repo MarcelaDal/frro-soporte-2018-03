@@ -16,16 +16,15 @@ async def votar(request):
     req = await request.json()
     cancion = req.get('cancion')
     sala_id = req.get('sala')
-    usuario_id = req.get('usuario')
-    if not cancion or not sala_id or not usuario_id:
-        return json_response(status=400, data={"error":True, 'message': 'Bad Request '})
-    if cancion and sala_id and usuario_id:
+    usuario = req.get('usuario')
+    password = req.get('password')
+    if cancion and sala_id and usuario and password:
         logicUsuario = LogicUsuario()
         logicSala = LogicSala()
         logicVoto = LogicVoto()
         logicVotacion = LogicVotacion()
         logicSesion = LogicSesion()
-        usuario = logicUsuario.buscar_por_id(usuario_id)
+        usuario = logicUsuario.buscar_por_nombre(usuario, password)
         if not usuario:
             return json_response(status=400, data={'message': 'No existe usuario registrado con ese id.'})
         sala = logicSala.buscar_por_id(sala_id)

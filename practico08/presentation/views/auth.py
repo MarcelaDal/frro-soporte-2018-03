@@ -17,11 +17,12 @@ class Auth(web.View):
     async def post(self):
         req = await self.request.json()
         nombre = req.get('nombre')
-        if not nombre:
+        password = req.get('password')
+        if not nombre or not password:
             return web.json_response(status=400, data={'message': 'Bad Request'})
         nuevo_usuario = Usuario()
         nuevo_usuario.nombre = nombre
-        nuevo_usuario.id_usuario_spotify = self.request.app['config']['client_id']
+        nuevo_usuario.password = password
         logicUsuario = LogicUsuario()
         usuario = logicUsuario.alta(nuevo_usuario)
         if type(usuario) == Usuario:
@@ -64,7 +65,7 @@ class Auth(web.View):
                         if type(user) == Usuario:
                             return web.json_response(status=200, data={'message': 'Usuario registrado con éxito!', 'error': False})
                         else:
-                            return web.json_response(status=500, data={'message': 'Se produjo un error.', 'error': True})
+                            return web.json_response(status=500, data={'message': 'Se produjo un error.', 'error': str(user)})
 
         else:
             return web.json_response(status=400, data={'message': 'Bad Request', 'error': True})

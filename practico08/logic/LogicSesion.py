@@ -11,3 +11,11 @@ class LogicSesion(LogicSingleton):
         s = DatosSesion().buscar(id_usuario, id_sala)
         return s
 
+    def baja(self, sesion):
+        bajamiento = DatosSesion().baja(sesion)
+        return bajamiento
+
+    def get_todos_por_id_sala(self, id_sala):
+        todos = DatosSesion().todos()
+        todos_por_id_sala = list(filter(lambda x: x.id_sala ==id_sala, todos))
+        return todos_por_id_sala

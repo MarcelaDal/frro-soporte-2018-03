@@ -17,7 +17,7 @@ class DatosUsuarios(DatosSingleton):
         """
         Da de baja un usuario
         Devuelve True si la baja fue exitosa
-        :type usuario:int
+        :type usuario:Usuario
         :rtype:
         """
         try:

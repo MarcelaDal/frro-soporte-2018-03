@@ -20,6 +20,9 @@ class DatosSesion(DatosSingleton):
         s = self.session.query(Sesion).all()
         return s
 
+    def baja(self):
+        pass
+
     def borrar_todos(self):
         """
         Borra todos los socios de la base de datos.
@@ -34,3 +37,16 @@ class DatosSesion(DatosSingleton):
         except Exception:
             return False
         return True
+
+    def baja(self, sesion):
+        """
+        Da de baja un usuario
+        Devuelve True si la baja fue exitosa
+        :type sesion:Sesion
+        :rtype:
+        """
+        try:
+            self.session.delete(sesion)
+            return True
+        except:
+            return False

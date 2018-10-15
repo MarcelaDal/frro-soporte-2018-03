@@ -31,7 +31,7 @@ class LogicUsuario(LogicSingleton):
             return e
 
     def isUsuarioUnico(self,nombre):
-        if not self.buscar_por_nombre(nombre):
+        if not DatosUsuarios().buscar_por_nombre(nombre):
             return True
         else:
             raise UsuarioRepetido("usuario repetido")
@@ -55,14 +55,14 @@ class LogicUsuario(LogicSingleton):
         else:
             return False
 
-    def buscar_por_nombre(self, nombre):
+    def buscar_por_nombre(self, nombre, password):
         """
         Busca un usuario por nombre
         :type nombre: str
         :rtype: Usuario
         """
         u = DatosUsuarios().buscar_por_nombre(nombre)
-        if u:
+        if u and u.password == password:
             return u
         else:
             return False
@@ -79,14 +79,7 @@ class LogicUsuario(LogicSingleton):
         :rtype: Usuario
         """
         try:
-            if self.isUsuarioUnico(usuario.nombre) and self.isLongitudValida(usuario.nombre):
-                p = DatosUsuarios().modificar(usuario)
-                return p
+            p = DatosUsuarios().modificar(usuario)
+            return p
         except Exception as e:
             return e
-
-
-if __name__ == '__main__':
-    from practico08.data import Usuario
-    user = LogicUsuario().alta(Usuario(nombre="Totito"))
-    print(user)
