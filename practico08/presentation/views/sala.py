@@ -56,14 +56,13 @@ async def crear_sala(request):
 async def buscar_canciones(request):
     ''' /sala/buscar_canciones?q=abba '''
     params = request.rel_url.query
-    keywords = params['q']
+    keywords = params['query']
     query = (keywords.replace(' ', '%20'))
     if keywords:
         async with ClientSession() as session:
             #TODO ver como funciona con parámetros que tienen espacios
             async with session.get('https://api.spotify.com/v1/search?q=' + query + '&type=track',
                                    headers={'Content-Type': 'application/json',
-                                       #TODO ver autorizacion
                                             'Authorization': 'Bearer ' + request.app['token']
                                             }) as resp:
                     text = await resp.json()
@@ -100,12 +99,16 @@ async def obtener_sala_por_link(request):
         sala = logicSala.busca_por_codigo(code)
         if type(sala) == Sala:
             #TODO pasar Sala a JSON
+<<<<<<< HEAD
             return web.json_response(status=200, data={'message': '', 'body': sala.id})
+=======
+            return web.json_response(status=200, data={'message': '', 'body': {'id_sala': sala.id}, 'error': False})
+>>>>>>> dcd07ce3f4a90a06265f81d14b949da7c2bcb9b0
         else:
             return web.json_response(status=200, data={'message': 'No existe sala con ese código de invitación.', 'error': True})
 
     else:
-        return web.json_response(status=400, data={'message': 'Bad Request', 'error':True})
+        return web.json_response(status=400, data={'message': 'Bad Request', 'error': True})
 
 
 @Routes.post("/sala/add")
@@ -125,11 +128,12 @@ async def aniadir_usuario_sala(requests):
 
     sesion = LogicSesion().alta(Sesion(id_sala=sala.id,id_usuario=usuario.id))
     if sesion:
-        return web.json_response(status=200, data={'message': 'Session reistrada con éxito'})
+        return web.json_response(status=200, data={'message': 'Session registrada con éxito'})
     else:
         return web.json_response(status=500, data={"error": True, 'message': 'Se produjo un error.'})
 
 
+<<<<<<< HEAD
 
 
 
@@ -153,3 +157,38 @@ async def remove_user(request):
         return web.json_response(status=200, data={'message': 'usuario eliminado de la sala'})
     else:
         return web.json_response(status=200, data={'message': 'error desconocido'})
+=======
+@Routes.post("/sala/playlist/modificar")
+async def modificar_playlist(request):
+    req = await request.json()
+    id_sala = req.get("id_sala")
+    playlist_name = req.get('playlist_name')
+    playlist_description = req.get('playlist_description')
+    if not id_sala or not playlist_name or not playlist_description:
+        return web.json_response(status=400, data={'message': 'Bad Request'})
+    sala = LogicSala().buscar_por_id(id_sala)
+    if type(sala) == Sala:
+        logicUsuario = LogicUsuario()
+        usuario = logicUsuario.buscar_usuario_por_id(sala.id_admin)
+        async with ClientSession() as session:
+                id_playlist = sala.id_playlist
+                async with session.put('https://api.spotify.com/v1/playlists/' + id_playlist,
+                                         headers={
+                                            'Content-Type': 'application/json',
+                                            'Authorization': 'Bearer ' + usuario.token
+                                        },
+                                        json={
+                                            'name': playlist_name,
+                                            'description': playlist_description,
+                                            'public': 'false'
+                                        }
+                                       ) as resp:
+                    text = await resp.json()
+                    if text['error']:
+                        return web.json_response(status=text['error']['status'], data={'message': text['error']['message'], 'error': True})
+                    else:
+                        return web.json_response(status=200, data={'message': '', 'body': text, 'error': False})
+
+    else:
+        return web.json_response(status=500, data={'message': 'Se produjo un error.'})
+>>>>>>> dcd07ce3f4a90a06265f81d14b949da7c2bcb9b0

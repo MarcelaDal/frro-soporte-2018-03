@@ -11,11 +11,11 @@ async def votar(request):
     """
     :type request: Request
     :rtype: json_response
-    Para votar, parametros: sala, cancion, nombre de usuario listo :D
+    Para votar, parametros: sala, cancion, nombre de usuario
     """
     req = await request.json()
-    cancion = req.get('cancion')
-    sala_id = req.get('sala')
+    cancion = req.get('id_cancion')
+    sala_id = req.get('id_sala')
     usuario = req.get('usuario')
     password = req.get('password')
     if cancion and sala_id and usuario and password:
