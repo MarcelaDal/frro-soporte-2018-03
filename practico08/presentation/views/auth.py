@@ -3,6 +3,7 @@ from aiohttp import web, ClientSession
 from practico08.data.models import Usuario, Sala
 from practico08.logic import LogicUsuario
 from practico08.presentation import Routes
+import json
 
 @Routes.view("/auth")
 class Auth(web.View):
@@ -37,7 +38,7 @@ class Auth(web.View):
             else:
                 return web.json_response(status=200, data={'message': 'Usuario registrado con éxito'})
         else:
-            return web.json_response(status=500, data={'error':True, 'messasege':str(usuario)})
+            return web.json_response(status=200, data=({'error':True, 'message':str(usuario)}))
 
     async def get(self):
         code = self.request.rel_url.query.get('code')
@@ -65,7 +66,9 @@ class Auth(web.View):
                         if type(user) == Usuario:
                             return web.json_response(status=200, data={'message': 'Usuario registrado con éxito!', 'error': False})
                         else:
-                            return web.json_response(status=500, data={'message': 'Se produjo un error.', 'error': str(user)})
+                            return web.json_response(status=500, data={'message': 'Se produjo un error.', 'error': True})
+                    else:
+                        return web.json_response(status=resp.status, data={'message': resp.json, 'error': True})
 
         else:
             return web.json_response(status=400, data={'message': 'Bad Request', 'error': True})
