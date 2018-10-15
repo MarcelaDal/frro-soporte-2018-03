@@ -56,14 +56,13 @@ async def crear_sala(request):
 async def buscar_canciones(request):
     ''' /sala/buscar_canciones?q=abba '''
     params = request.rel_url.query
-    keywords = params['q']
+    keywords = params['query']
     query = (keywords.replace(' ', '%20'))
     if keywords:
         async with ClientSession() as session:
             #TODO ver como funciona con parámetros que tienen espacios
             async with session.get('https://api.spotify.com/v1/search?q=' + query + '&type=track',
                                    headers={'Content-Type': 'application/json',
-                                       #TODO ver autorizacion
                                             'Authorization': 'Bearer ' + request.app['token']
                                             }) as resp:
                     text = await resp.json()
@@ -80,7 +79,7 @@ async def obtener_sala_por_link(request):
         sala = logicSala.busca_por_codigo(code)
         if type(sala) == Sala:
             #TODO pasar Sala a JSON
-            return web.json_response(status=200, data={'message': '', 'body': '', 'error': False})
+            return web.json_response(status=200, data={'message': '', 'body': {'id_sala': sala.id}, 'error': False})
         else:
             return web.json_response(status=200, data={'message': 'No existe sala con ese código de invitación.', 'error': True})
 
