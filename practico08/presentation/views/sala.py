@@ -4,6 +4,7 @@ from practico08.logic import LogicSala, LogicUsuario, LogicSesion
 from practico08.presentation import Routes
 from practico08.util import getRandomsString
 
+
 @Routes.post("/sala/new")
 #pasa en el body el id del admin
 async def crear_sala(request):
@@ -99,11 +100,7 @@ async def obtener_sala_por_link(request):
         sala = logicSala.busca_por_codigo(code)
         if type(sala) == Sala:
             #TODO pasar Sala a JSON
-<<<<<<< HEAD
-            return web.json_response(status=200, data={'message': '', 'body': sala.id})
-=======
             return web.json_response(status=200, data={'message': '', 'body': {'id_sala': sala.id}, 'error': False})
->>>>>>> dcd07ce3f4a90a06265f81d14b949da7c2bcb9b0
         else:
             return web.json_response(status=200, data={'message': 'No existe sala con ese código de invitación.', 'error': True})
 
@@ -133,10 +130,6 @@ async def aniadir_usuario_sala(requests):
         return web.json_response(status=500, data={"error": True, 'message': 'Se produjo un error.'})
 
 
-<<<<<<< HEAD
-
-
-
 @Routes.post("/sala/remove")
 async def remove_user(request):
     req = await request.json()
@@ -157,7 +150,8 @@ async def remove_user(request):
         return web.json_response(status=200, data={'message': 'usuario eliminado de la sala'})
     else:
         return web.json_response(status=200, data={'message': 'error desconocido'})
-=======
+
+
 @Routes.post("/sala/playlist/modificar")
 async def modificar_playlist(request):
     req = await request.json()
@@ -191,4 +185,3 @@ async def modificar_playlist(request):
 
     else:
         return web.json_response(status=500, data={'message': 'Se produjo un error.'})
->>>>>>> dcd07ce3f4a90a06265f81d14b949da7c2bcb9b0
