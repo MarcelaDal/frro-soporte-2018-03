@@ -26,14 +26,13 @@ async def votar(request):
         logicSesion = LogicSesion()
         usuario = logicUsuario.buscar_por_nombre(usuario, password)
         if not usuario:
-            return json_response(status=400, data={'message': 'No existe usuario registrado con ese id.'})
+            return json_response(status=200, data={'message': 'No existe usuario registrado con ese id.', 'error': True})
         sala = logicSala.buscar_por_id(sala_id)
         if not sala:
-            return json_response(status=400, data={'message': 'No existe sala registrada con ese id.'})
+            return json_response(status=200, data={'message': 'No existe sala registrada con ese id.', 'error': True})
         session = logicSesion.buscar(usuario.id, sala.id)
         if not session:
-            # TODO mejorar mensaje de error
-            return json_response(status=400, data={'message': "No existe sesión"})
+            return json_response(status=200, data={'message': "Debe crear una sesión para iniciar votación.", 'error': True})
         votacion = logicVotacion.buscar_por_id_sala(sala.id)
         if not sala.votacion_vigente:
             votacion = logicVotacion.alta(Votacion(id_sala=sala.id, tiempo_vida=0))
@@ -42,7 +41,7 @@ async def votar(request):
             job = await request.app['horario'].spawn(lanzar_votacion(sala, votacion, request.app))
         voto = logicVoto.alta(Voto(id_usuario=usuario.id, id_votacion=votacion.id, id_cancion=cancion))
         if voto:
-            return json_response(status=200, data={'messaje': 'El voto se efectuó con éxito!', 'body': {'id_voto': voto.id}})
+            return json_response(status=200, data={'message': 'El voto se efectuó con éxito!', 'body': {'id_voto': voto.id}, 'error': False})
     else:
         return json_response(status=400, data={'message': 'Bad Request'})
 

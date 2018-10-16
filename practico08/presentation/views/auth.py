@@ -28,7 +28,7 @@ class Auth(web.View):
         usuario = logicUsuario.alta(nuevo_usuario)
         if type(usuario) == Usuario:
             if req.get('hasSpotify') and not (usuario.token or usuario.refresh_token):
-                return web.json_response(status=200, data={"url": 'https://accounts.spotify.com/authorize?' +
+                return web.json_response(status=200, data={"body": 'https://accounts.spotify.com/authorize?' +
                                                                   urlencode({'response_type': 'code',
                                                                              'client_id': self.request.app['config']['client_id'],
                                                                              'scope': self.request.app['config']['scope'],
@@ -36,7 +36,7 @@ class Auth(web.View):
                                                                              'state': str(usuario.id)
                                                                              })})
             else:
-                return web.json_response(status=200, data={'message': 'Usuario registrado con éxito'})
+                return web.json_response(status=200, data={'message': 'Usuario registrado con éxito', 'error': False})
         else:
             return web.json_response(status=200, data=({'error':True, 'message':str(usuario)}))
 

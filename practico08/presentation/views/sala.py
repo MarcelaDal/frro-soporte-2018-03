@@ -22,7 +22,7 @@ async def crear_sala(request):
     playlist_name = req.get('playlist_name')
     playlist_description = req.get('playlist_description')
     logicUsuario = LogicUsuario()
-    usuario = logicUsuario.buscar_por_nombre(nombre,password)
+    usuario = logicUsuario.buscar_por_nombre(nombre, password)
     if type(usuario) == Usuario and usuario.token:
         nueva_sala = Sala()
         nueva_sala.id_admin = usuario.id
@@ -43,7 +43,7 @@ async def crear_sala(request):
             usuario.token = token_nuevo['access_token']
             usuario = logicUsuario.modificar(usuario)
             if not usuario:
-                return web.json_response(data={'eroor':'hubo bardo'})
+                return web.json_response(data={'error': True, 'message': 'No se pudo crear la sala.'})
             id_usuario_spotify = usuario.id_usuario_spotify
             data = {'public': 'false'}
             data['name'] = playlist_name if playlist_name else "Spotifesta"
@@ -62,36 +62,38 @@ async def crear_sala(request):
                     logicSala = LogicSala()
                     sala = logicSala.alta(nueva_sala)
                     if type(sala) == Sala:
-                        return web.json_response(status=200, data={'message': 'La lista de reproducción para tu fiesta se creó con éxito!'})
+                        return web.json_response(status=200, data={'message': 'La lista de reproducción para tu fiesta se creó con éxito!', 'error': False, 'body': {'id_sala': sala.id, 'id_playlist': sala.id_playlist}})
                     else:
-                        return web.json_response(status=500, data={'message': 'Se produjo un error.'})
+                        return web.json_response(status=200, data={'message': 'Se produjo un error con la sala.', 'error': True})
                 else:
                     return web.json_response(status=resp.status, data=text)
     else:
-        return web.json_response(status=500, data={'message': 'Se produjo un error.'})
+        return web.json_response(status=200, data={'message': 'Se produjo un error con el usuario.','error': True})
 
 
-@Routes.get("/sala/buscar_canciones")
+@Routes.get("/sala/{id_sala}/buscar_canciones")
 async def buscar_canciones(request):
-    ''' /sala/buscar_canciones?q=abba '''
+    ''' /sala/buscar_canciones?query=abba '''
     params = request.rel_url.query
     keywords = params['query']
-    query = (keywords.replace(' ', '%20'))
-    if keywords:
+    id_sala = request.match_info['id_sala']
+    sala= LogicSala().buscar_por_id(id_sala)
+    if keywords and sala:
+        query = (keywords.replace(' ', '%20'))
+        user = LogicUsuario().buscar_por_id(sala.id_admin)
         async with ClientSession() as session:
-            #TODO ver como funciona con parámetros que tienen espacios
             async with session.get('https://api.spotify.com/v1/search?q=' + query + '&type=track',
                                    headers={'Content-Type': 'application/json',
-                                            'Authorization': 'Bearer ' + request.app['token']
+                                            'Authorization': 'Bearer ' + user.token
                                             }) as resp:
                     text = await resp.json()
                     return web.json_response(status=200, data={'message': '', 'body': text, 'error': False})
     else:
-        return web.json_response(status=400, data={'message': 'Bad Request', 'error': True})
+        return web.json_response(status=200, data={'message': 'Bad Request', 'error': True})
 
 
 @Routes.get("/sala/users")
-async def obtener_usuario_de_sala(request):
+async def obtener_usuarios_de_sala(request):
     req = await request.json()
     id_sala = req.get("id_sala")
     if id_sala:
@@ -102,8 +104,8 @@ async def obtener_usuario_de_sala(request):
             logicSesion = LogicSesion()
             sesiones_en_sala = logicSesion.get_todos_por_id_sala(sala.id)
             usuarios = [LogicUsuario().buscar_por_id(sesion.id_usuario) for sesion in sesiones_en_sala]
-            usuarios_pelados = [{'id': usuario.id, 'nombre': usuario.nombre} for usuario in usuarios]
-            return web.json_response(status=200, data={'message': '', 'body': usuarios_pelados})
+            array_usuarios = [{'id': usuario.id, 'nombre': usuario.nombre} for usuario in usuarios]
+            return web.json_response(status=200, data={'message': '', 'body': array_usuarios})
         else:
             return web.json_response(status=200, data={'message': 'No existe sala con ese código de invitación.', 'error': True})
 
@@ -117,7 +119,6 @@ async def obtener_sala_por_link(request):
         logicSala = LogicSala()
         sala = logicSala.busca_por_codigo(code)
         if type(sala) == Sala:
-            #TODO pasar Sala a JSON
             return web.json_response(status=200, data={'message': '', 'body': {'id_sala': sala.id}, 'error': False})
         else:
             return web.json_response(status=200, data={'message': 'No existe sala con ese código de invitación.', 'error': True})
@@ -136,16 +137,16 @@ async def aniadir_usuario_sala(requests):
         return web.json_response(status=400, data={"message": "Bad Request"})
     usuario = LogicUsuario().buscar_por_nombre(nombre,password)
     if not usuario:
-        return web.json_response(status=400, data={"message": "No existe usuario con ese id."})
+        return web.json_response(status=200, data={"message": "No existe usuario con ese id.", 'error': True})
     sala = LogicSala().buscar_por_id(id_sala)
     if not sala:
-        return web.json_response(status=400, data={"message": "No existe sala con ese id."})
+        return web.json_response(status=400, data={"message": "No existe sala con ese id.", 'error': True})
 
     sesion = LogicSesion().alta(Sesion(id_sala=sala.id,id_usuario=usuario.id))
     if sesion:
-        return web.json_response(status=200, data={'message': 'Session registrada con éxito'})
+        return web.json_response(status=200, data={'message': 'Session registrada con éxito', 'error': False})
     else:
-        return web.json_response(status=500, data={"error": True, 'message': 'Se produjo un error.'})
+        return web.json_response(status=200, data={"error": True, 'message': 'Se produjo un error.'})
 
 
 @Routes.post("/sala/remove")
@@ -159,15 +160,15 @@ async def remove_user(request):
         return web.json_response(status=400, data={"message": "Bad Request"})
     usuario = LogicUsuario().buscar_por_nombre(admin, password)
     if not usuario:
-        return web.json_response(status=400, data={"message": "Credenciales erroneas"})
+        return web.json_response(status=400, data={"message": "Credenciales erroneas", 'error': True})
     sesion = LogicSesion().buscar(id_usuario, id_sala)
     if not sesion:
-        return web.json_response(status=400, data={"message": "Credenciales erroneas"})
+        return web.json_response(status=400, data={"message": "Credenciales erroneas", 'error': True})
     bajamiento = LogicSesion().baja(sesion)
     if bajamiento:
-        return web.json_response(status=200, data={'message': 'usuario eliminado de la sala'})
+        return web.json_response(status=200, data={'message': 'usuario eliminado de la sala', 'error': False})
     else:
-        return web.json_response(status=200, data={'message': 'error desconocido'})
+        return web.json_response(status=200, data={'message': 'error desconocido', 'error': True})
 
 
 @Routes.post("/sala/playlist/modificar")
@@ -180,8 +181,7 @@ async def modificar_playlist(request):
         return web.json_response(status=400, data={'message': 'Bad Request'})
     sala = LogicSala().buscar_por_id(id_sala)
     if type(sala) == Sala:
-        logicUsuario = LogicUsuario()
-        usuario = logicUsuario.buscar_usuario_por_id(sala.id_admin)
+        usuario = LogicUsuario().buscar_por_id(sala.id_admin)
         async with ClientSession() as session:
                 id_playlist = sala.id_playlist
                 async with session.put('https://api.spotify.com/v1/playlists/' + id_playlist,

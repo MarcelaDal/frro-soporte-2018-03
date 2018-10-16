@@ -62,7 +62,7 @@ class LogicUsuario(LogicSingleton):
         :rtype: Usuario
         """
         u = DatosUsuarios().buscar_por_nombre(nombre)
-        if u and u.password == password:
+        if u and u.password == str(password):
             return u
         else:
             return False
