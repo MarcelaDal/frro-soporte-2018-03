@@ -21,6 +21,13 @@ class DatosVotos(DatosSingleton):
         votos = self.session.query(Voto).filter(Voto.id_votacion == id_votacion).all()
         return votos
 
+    def baja(self, voto):
+        try:
+            self.session.delete(voto)
+            return True
+        except:
+            return False
+
     def todos(self):
         """
         Devuelve
@@ -38,7 +45,7 @@ class DatosVotos(DatosSingleton):
         try:
             votos = self.todos()
             for voto in votos:
-                self.session.delete(votos)
+                self.session.delete(voto)
             self.session.commit()
         except Exception:
             return False

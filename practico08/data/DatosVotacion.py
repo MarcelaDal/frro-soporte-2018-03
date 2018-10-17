@@ -37,7 +37,7 @@ class DatosVotacion(DatosSingleton):
         try:
             votaciones = self.todos()
             for votacion in votaciones:
-                self.session.delete(votaciones)
+                self.session.delete(votacion)
             self.session.commit()
         except Exception:
             return False

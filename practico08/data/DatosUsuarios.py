@@ -75,7 +75,7 @@ class DatosUsuarios(DatosSingleton):
         try:
             usuarios = self.todos()
             for usuario in usuarios:
-                self.baja(usuarios)
+                self.baja(usuario)
             self.session.commit()
         except Exception:
             return False
