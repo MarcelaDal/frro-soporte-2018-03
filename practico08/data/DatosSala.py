@@ -61,3 +61,7 @@ class DatosSala(DatosSingleton):
         except Exception:
             return False
         return True
+
+    def buscar_por_id_admin(self, id_admin):
+        sala = self.session.query(Sala).filter(Sala.id_admin == id_admin).first()
+        return sala

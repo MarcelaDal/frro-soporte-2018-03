@@ -3,7 +3,7 @@ from base64 import b64encode
 from aiohttp import web, ClientSession
 from practico08.data import Sala, Usuario, Sesion
 from practico08.logic import LogicSala, LogicUsuario, LogicSesion
-from practico08.presentation import Routes
+from practico08.server import Routes
 from practico08.util import getRandomsString
 import json
 
@@ -23,53 +23,53 @@ async def crear_sala(request):
     playlist_description = req.get('playlist_description')
     logicUsuario = LogicUsuario()
     usuario = logicUsuario.buscar_por_nombre(nombre, password)
-    if type(usuario) == Usuario and usuario.token:
-        nueva_sala = Sala()
-        nueva_sala.id_admin = usuario.id
-        nueva_sala.link_invitacion = getRandomsString()
-        async with ClientSession() as session:
-            token_nuevo = await session.post('https://accounts.spotify.com/api/token',
-                                             headers={
-                                                 'Authorization': 'Basic ' + b64encode((request.app['config']['client_id'] + ':' + request.app['config']['secret_id']).encode('ascii')).decode('ascii')
-                                             },
-                                             data={
-                                                 'grant_type': 'refresh_token',
-                                                 'refresh_token': usuario.refresh_token
-                                             })
-            if token_nuevo.status != 200:
-                error = await token_nuevo.text()
-                return web.Response(text=error)
-            token_nuevo = await token_nuevo.json()
-            usuario.token = token_nuevo['access_token']
-            usuario = logicUsuario.modificar(usuario)
-            if not usuario:
-                return web.json_response(data={'error': True, 'message': 'No se pudo crear la sala.'})
-            id_usuario_spotify = usuario.id_usuario_spotify
-            data = {'public': 'false'}
-            data['name'] = playlist_name if playlist_name else "Spotifesta"
-            if playlist_description:
-                data['description'] = playlist_description
-            async with session.post('https://api.spotify.com/v1/users/'+str(id_usuario_spotify)+'/playlists',
-                                    headers={
-                                        'Content-Type': 'application/json',
-                                        'Authorization': 'Bearer ' + usuario.token
-                                    },
-                                    json=data
-                                    ) as resp:
-                text = await resp.json()
-                if resp.status in [200, 201]:
-                    nueva_sala.id_playlist = str(text['id'])
-                    logicSala = LogicSala()
-                    sala = logicSala.alta(nueva_sala)
-                    #TODO: agregué esto porq al momento de la votacion sino trae problemas
-                    sesion = LogicSesion().alta(Sesion(id_sala=sala.id, id_usuario=usuario.id))
-                    if type(sala) == Sala and sesion:
+    if usuario:
+        try:
+            nueva_sala = Sala()
+            nueva_sala.id_admin = usuario.id
+            nueva_sala.link_invitacion = getRandomsString()
+            async with ClientSession() as session:
+                token_nuevo = await session.post('https://accounts.spotify.com/api/token',
+                                                 headers={
+                                                     'Authorization': 'Basic ' + b64encode((request.app['config']['client_id'] + ':' + request.app['config']['secret_id']).encode('ascii')).decode('ascii')
+                                                 },
+                                                 data={
+                                                     'grant_type': 'refresh_token',
+                                                     'refresh_token': usuario.refresh_token
+                                                 })
+                if token_nuevo.status != 200:
+                    error = await token_nuevo.text()
+                    return web.Response(text=error)
+                token_nuevo = await token_nuevo.json()
+                usuario.token = token_nuevo['access_token']
+                usuario = logicUsuario.modificar(usuario)
+                if not usuario:
+                    return web.json_response(data={'error': True, 'message': 'No se pudo crear la sala.'})
+                id_usuario_spotify = usuario.id_usuario_spotify
+                data = {'public': 'false'}
+                data['name'] = playlist_name if playlist_name else "Spotifesta"
+                if playlist_description:
+                    data['description'] = playlist_description
+                async with session.post('https://api.spotify.com/v1/users/'+str(id_usuario_spotify)+'/playlists',
+                                        headers={
+                                            'Content-Type': 'application/json',
+                                            'Authorization': 'Bearer ' + usuario.token
+                                        },
+                                        json=data
+                                        ) as resp:
+                    text = await resp.json()
+                    if resp.status in [200, 201]:
+                        nueva_sala.id_playlist = str(text['id'])
+                        logicSala = LogicSala()
+                        sala = logicSala.alta(nueva_sala)
+                        #TODO: agregué esto porq al momento de la votacion sino trae problemas
+                        sesion = LogicSesion().alta(Sesion(id_sala=sala.id, id_usuario=usuario.id))
                         json_sala= {'id_sala': sala.id, 'id_playlist': sala.id_playlist, 'id_admin': sala.id_admin, 'link_invitacion': sala.link_invitacion, 'hay_votacion': sala.votacion_vigente}
                         return web.json_response(status=200, data={'message': 'La lista de reproducción para tu fiesta se creó con éxito!', 'error': False, 'body': json_sala })
                     else:
-                        return web.json_response(status=200, data={'message': 'Se produjo un error con la sala.', 'error': True})
-                else:
-                    return web.json_response(status=resp.status, data=text)
+                        return web.json_response(status=resp.status, data=text)
+        except Exception as e:
+            return web.json_response(status=200, data={'message': 'Se produjo un error con la sala.', 'error': str(e)})
     else:
         return web.json_response(status=200, data={'message': 'Se produjo un error con el usuario.','error': True})
 
@@ -144,11 +144,11 @@ async def aniadir_usuario_sala(requests):
     sala = LogicSala().buscar_por_id(id_sala)
     if not sala:
         return web.json_response(status=400, data={"message": "No existe sala con ese id.", 'error': True})
-    sesion = LogicSesion().alta(Sesion(id_sala=sala.id, id_usuario=usuario.id))
-    if sesion:
+    try:
+        sesion = LogicSesion().alta(Sesion(id_sala=sala.id, id_usuario=usuario.id))
         return web.json_response(status=200, data={'message': 'Session registrada con éxito', 'error': False, 'body': {'user_id': usuario.id}})
-    else:
-        return web.json_response(status=200, data={"error": True, 'message': 'Se produjo un error.'})
+    except Exception as e:
+        return web.json_response(status=200, data={"error": True, 'message': str(e)})
 
 
 @Routes.post("/sala/user/remove")

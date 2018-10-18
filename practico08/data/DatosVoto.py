@@ -28,6 +28,10 @@ class DatosVotos(DatosSingleton):
         except:
             return False
 
+    def buscar_por_id_sesion(self, id_sesion):
+        voto = self.session.query(Voto).filter(Voto.id_usuario == id_sesion).first()
+        return voto
+
     def todos(self):
         """
         Devuelve

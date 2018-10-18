@@ -14,7 +14,7 @@ class TestDatos(unittest.TestCase):
         self.dv = DatosVotos()
         self.dse = DatosSesion()
         self.dvv = DatosVotacion()
-        self.datos = [self.dsa, self.du, self.dv, self.dse, self.dv]
+        self.datos = [self.dsa, self.du, self.dv, self.dse, self.dvv]
 
     def tearDown(self):
         super(TestDatos, self).tearDown()

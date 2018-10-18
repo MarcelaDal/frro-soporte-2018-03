@@ -2,7 +2,7 @@ from urllib.parse import urlencode
 from aiohttp import web, ClientSession
 from practico08.data.models import Usuario, Sala
 from practico08.logic import LogicUsuario
-from practico08.presentation import Routes
+from practico08.server import Routes
 import json
 
 @Routes.view("/auth")
@@ -25,8 +25,9 @@ class Auth(web.View):
         nuevo_usuario.nombre = nombre
         nuevo_usuario.password = password
         logicUsuario = LogicUsuario()
-        usuario = logicUsuario.alta(nuevo_usuario)
-        if type(usuario) == Usuario:
+        try:
+            usuario = logicUsuario.alta(nuevo_usuario)
+
             if req.get('hasSpotify') and not (usuario.token or usuario.refresh_token):
                 return web.json_response(status=200, data={"body": 'https://accounts.spotify.com/authorize?' +
                                                                   urlencode({'response_type': 'code',
@@ -37,8 +38,8 @@ class Auth(web.View):
                                                                              })})
             else:
                 return web.json_response(status=200, data={'message': 'Usuario registrado con éxito', 'error': False})
-        else:
-            return web.json_response(status=200, data=({'error':True, 'message':str(usuario)}))
+        except Exception as e:
+            return web.json_response(status=200, data=({'error':True, 'message':str(e)}))
 
     async def get(self):
         code = self.request.rel_url.query.get('code')

@@ -2,12 +2,7 @@ from practico08.data import DatosUsuarios
 from practico08.logic import LogicSingleton
 from practico08.logic.LogicSala import LogicSala
 
-
-class UsuarioRepetido(Exception):
-    pass
-
-
-class UsuarioLongitudInvalida(Exception):
+class UsuarioException(Exception):
     pass
 
 
@@ -19,29 +14,24 @@ class LogicUsuario(LogicSingleton):
         :type user:Usuario
         :rtype: Usuario
         """
-
-        try:
-
-            if self.isUsuarioUnico(usuario.nombre) and self.isLongitudValida(usuario.nombre):
-                p = DatosUsuarios().alta(usuario)
-                return p
-            else:
-                return False
-        except Exception as e:
-            return e
+        if self.isUsuarioUnico(usuario.nombre) and self.isLongitudValida(usuario.nombre):
+            p = DatosUsuarios().alta(usuario)
+            return p
+        else:
+            return False
 
     def isUsuarioUnico(self,nombre):
         if not DatosUsuarios().buscar_por_nombre(nombre):
             return True
         else:
-            raise UsuarioRepetido("usuario repetido")
+            raise UsuarioException("usuario repetido")
 
     def isLongitudValida(self,nombre):
         long = len(nombre)
         if 20 >= long >= 6:
             return True
         else:
-            raise UsuarioLongitudInvalida("Longitud invalida")
+            raise UsuarioException("Longitud invalida")
 
     def buscar_por_id(self, id):
         """
@@ -78,8 +68,8 @@ class LogicUsuario(LogicSingleton):
         :type usuario:Usuario
         :rtype: Usuario
         """
-        try:
-            p = DatosUsuarios().modificar(usuario)
-            return p
-        except Exception as e:
-            return e
+        p = DatosUsuarios().modificar(usuario)
+        return p
+
+    def borrar_todos(self):
+        DatosUsuarios().borrar_todos()

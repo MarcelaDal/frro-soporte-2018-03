@@ -3,7 +3,7 @@ from aiohttp.web import Request, json_response
 import asyncio
 from practico08.data.models import Voto, Votacion
 from practico08.logic import LogicUsuario, LogicVoto,LogicSala, LogicSesion, LogicVotacion
-from practico08.presentation import Routes
+from practico08.server import Routes
 
 
 @Routes.post('/voto')
@@ -34,14 +34,16 @@ async def votar(request):
         if not session:
             return json_response(status=200, data={'message': "Debe crear una sesión para iniciar votación.", 'error': True})
         votacion = logicVotacion.buscar_por_id_sala(sala.id)
-        if not sala.votacion_vigente:
+        if not votacion:
             votacion = logicVotacion.alta(Votacion(id_sala=sala.id, tiempo_vida=0))
             sala.votacion_vigente = True
             sala = logicSala.modificar(sala)
             job = await request.app['horario'].spawn(lanzar_votacion(sala, votacion, request.app))
-        voto = logicVoto.alta(Voto(id_usuario=usuario.id, id_votacion=votacion.id, id_cancion=cancion))
-        if voto:
+        try:
+            voto = logicVoto.alta(Voto(id_usuario=usuario.id, id_votacion=votacion.id, id_cancion=cancion))
             return json_response(status=200, data={'message': 'El voto se efectuó con éxito!', 'body': {'id_voto': voto.id}, 'error': False})
+        except Exception as e:
+            return json_response(status=200, data={'message':str(e), 'error': True})
     else:
         return json_response(status=400, data={'message': 'Bad Request'})
 

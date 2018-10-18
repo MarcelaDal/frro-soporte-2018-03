@@ -1,8 +1,8 @@
 from aiohttp import web
-from practico08.presentation import Routes
+from practico08.server import Routes
 from practico08.config import config
 import aiojobs
-from practico08.presentation.views import  *
+from practico08.server.views import  *
 
 
 async def init():

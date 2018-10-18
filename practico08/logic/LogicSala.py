@@ -1,5 +1,9 @@
-from practico08.data import DatosSala
+from practico08.data import DatosSala, DatosUsuarios
 from practico08.util import Singleton
+
+
+class SalaException(Exception):
+    pass
 
 
 class LogicSala(metaclass=Singleton):
@@ -7,6 +11,12 @@ class LogicSala(metaclass=Singleton):
         s = None
         # TODO validar que tiene una sala activa a la vez?
         # TODO Funcionalidad recortada debido a falta de presupuesto
+        user = DatosUsuarios().buscar_por_id(sala.id_admin)
+        if not user.token:
+            raise SalaException("El lince no tiene spotify, es pobre")
+        salita = DatosSala().buscar_por_id_admin(sala.id_admin)
+        if salita:
+            raise SalaException("usuario ya con sala")
         s = DatosSala().alta(sala)
         if s:
             return s
@@ -35,3 +45,6 @@ class LogicSala(metaclass=Singleton):
     def modificar(self, sala):
         sala = DatosSala().modificar(sala)
         return sala
+
+    def borrar_todos(self):
+        DatosSala().borrar_todos()
