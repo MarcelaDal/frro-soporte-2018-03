@@ -102,7 +102,6 @@ async def obtener_usuarios_de_sala(request):
         logicSala = LogicSala()
         sala = logicSala.buscar_por_id(id_sala)
         if type(sala) == Sala:
-            # TODO pasar Sala a JSON
             logicSesion = LogicSesion()
             sesiones_en_sala = logicSesion.get_todos_por_id_sala(sala.id)
             usuarios = [LogicUsuario().buscar_por_id(sesion.id_usuario) for sesion in sesiones_en_sala]
@@ -131,7 +130,6 @@ async def obtener_sala_por_link(request):
 
 @Routes.post("/sala/add")
 async def aniadir_usuario_sala(requests):
-    #TODO: habría que buscar el usuario x id
     req = await requests.json()
     id_sala = req.get("id_sala")
     nombre = req.get("nombre")
@@ -223,8 +221,6 @@ async def agregar_canciones(request):
             for uri in array_uris:
                 rep= uri.replace(':', '%3A')
                 uris += rep + '%2C'
-
-#            uris= 'spotify%3Atrack%3A4iV5W9uYEdYUVa79Axb7Rh%2Cspotify%3Atrack%3A1301WleyT98MSxVHPZCA6M'
             async with session.post('https://api.spotify.com/v1/playlists/' + id_playlist + '/tracks?position=0&uris=' + uris  ,
                                     headers={
                                         'Content-Type': 'application/json',
@@ -235,6 +231,8 @@ async def agregar_canciones(request):
                 if resp.status not in [200,201]:
                     return web.json_response(status=text['error']['status'], data={'message': text['error']['message'], 'error': True})
                 else:
+                    sala.puntero += 1
+                    logicSala = LogicSala().modificar(sala)
                     return web.json_response(status=200, data={'message': 'Se han agregado las canciones con éxito', 'body': text, 'error': False})
 
     else:
