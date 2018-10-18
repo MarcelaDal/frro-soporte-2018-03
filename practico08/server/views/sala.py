@@ -239,24 +239,3 @@ async def agregar_canciones(request):
 
     else:
         return web.json_response(status=500, data={'message': 'Se produjo un error.'})
-
-if __name__ == '__main__':
-    import asyncio
-    async def main():
-        from practico08.config import config
-        usuario = LogicUsuario().buscar_por_nombre("Thomirotho","theend1969")
-        async with ClientSession() as session:
-            async with session.post('https://accounts.spotify.com/api/token',
-                                    headers={
-                                        'Authorization': 'Basic ' + b64encode((config['client_id']+':'+config['secret_id']).encode('ascii')).decode('ascii')
-                                    },
-                                    json={
-                                        'grant_type': 'refresh_token',
-                                        'refresh_token': usuario.refresh_token
-                                    }) as resp:
-                text = await resp.text()
-                print(text)
-
-
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
